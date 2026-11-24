@@ -14,9 +14,10 @@ Estado: **cliente publicado; base de datos pendiente de conectar**. Esto no sign
 1. Conecta **Supabase** en ChatGPT y crea/elige un proyecto propio en la cuenta que controlas.
 2. En SQL Editor ejecuta el archivo `core/supabase-schema.sql`. Comprueba que **RLS esté activado** en `public.app_snapshots`.
 3. En Authentication habilita el inicio de sesión por correo. Configura como Site URL `https://estructura2500-ship-it.github.io/Mi-Ecosistema/`. Si hay confirmación de correo habilitada, comprueba que los enlaces de confirmación estén configurados.
-4. En el portal, abre **Mi cuenta**. Ingresa tu Project URL (debe terminar en `.supabase.co`) y únicamente la clave **publishable** o **anon** del proyecto, nunca la secret o service_role.
-5. Crea tu cuenta o inicia sesión. El acceso es común a todas las apps en este mismo sitio.
-6. Cuando se compruebe la conexión, se puede incorporar en la base de datos el respaldo privado de BRASA que ya proporcionaste. **No incrustes registros personales en ningún HTML público.**
+4. Después de crear tu cuenta, **deshabilita el registro público de usuarios** en Authentication si solo utilizarás tú el ecosistema; de lo contrario, terceros podrían crear cuentas aisladas y consumir recursos del proyecto.
+5. En el portal, abre **Mi cuenta**. Ingresa tu Project URL (debe terminar en `.supabase.co`) y únicamente la clave **publishable** o **anon** del proyecto, nunca la secret o service_role.
+6. Crea tu cuenta o inicia sesión. El acceso es común a todas las apps en este mismo sitio.
+7. Cuando se compruebe la conexión, se puede incorporar en la base de datos el respaldo privado de BRASA que ya proporcionaste. **No incrustes registros personales en ningún HTML público.**
 
 La URL y la clave *pública* del proyecto pueden ponerse después como configuración predeterminada en `core/private-cloud.js`; una clave privada **jamás**.
 
