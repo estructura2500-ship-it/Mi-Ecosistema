@@ -1,4 +1,4 @@
-const CACHE = 'orbita-personal-shell-v4';
+const CACHE = 'orbita-personal-shell-v5';
 const FILES = [
   './','./index.html','./styles.css','./app-manifest.js','./portal.js','./core/private-cloud.js','./manifest.webmanifest','./assets/icon.svg','./docs/orbita.html',
   './apps/basketbrain/index.html','./apps/pulso/index.html','./apps/juego-de-honor/index.html','./apps/calistenia/index.html','./apps/patinaje/index.html','./apps/patinaje/cloud.html','./apps/atlas-fisioterapia/index.html','./apps/brasa/index.html'
