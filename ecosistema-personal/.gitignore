@@ -1,0 +1,11 @@
+# Backups/exportaciones de datos personales
+**/*respaldo*.json
+**/*backup*.json
+**/*export*.json
+/private-data/
+/private-source/
+/sources/
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db

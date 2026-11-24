@@ -1,0 +1,9 @@
+# User backups and exported application data
+**/*respaldo*.json
+**/*backup*.json
+**/*export*.json
+**/backups/**
+**/private-data/**
+**/private-source/**
+.DS_Store
+Thumbs.db

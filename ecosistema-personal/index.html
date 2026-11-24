@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a1020">
+  <meta name="description" content="Portal privado de aplicaciones personales: entrenamiento, hábitos, movimiento y organización.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Órbita Personal — Aplicaciones</title>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Inicio del ecosistema">
+      <span class="brand-mark"><img src="./assets/icon.svg" alt=""></span>
+      <span><strong>Órbita Personal</strong><small>Tu espacio de trabajo</small></span>
+    </a>
+    <div class="top-actions"><span class="local-badge"><i></i> Datos guardados en este dispositivo</span><button class="install-btn" id="installBtn" hidden>Instalar portal</button></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy"><p class="eyebrow">ECOSISTEMA PERSONAL · V1</p><h1>Todo lo que estás<br><em>construyendo.</em></h1><p class="hero-text">Un punto de entrada para tus espacios de práctica, organización y bienestar. Abre una app y continúa donde la dejaste.</p><div class="hero-meta"><span><b id="appCount">7</b> aplicaciones activas</span><span class="dot">·</span><span>Funciona también sin conexión</span></div></div>
+      <div class="orbit-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="orbit-core">✦</div><span class="planet p1"></span><span class="planet p2"></span><span class="planet p3"></span></div>
+    </section>
+    <section class="section-head"><div><p class="eyebrow">TU BIBLIOTECA</p><h2>Aplicaciones</h2></div><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Buscar una aplicación…" aria-label="Buscar aplicación"></label></section>
+    <section id="appGrid" class="app-grid" aria-live="polite"></section>
+    <section class="section-head secondary-head"><div><p class="eyebrow">EN DESARROLLO</p><h2>Más espacios</h2></div></section>
+    <section class="future-grid">
+      <article class="future-card paused"><span class="future-icon">◌</span><div><h3>Finanzas</h3><p>La integración queda en pausa.</p></div><span class="status-tag">EN PAUSA</span></article>
+      <article class="future-card"><span class="future-icon orbita-icon">◎</span><div><h3>Órbita · Extensión</h3><p>Extensión de navegador independiente del portal.</p></div><a class="text-link" href="./docs/orbita.html">Ver nota <span>↗</span></a></article>
+      <article class="future-card future"><span class="future-icon">＋</span><div><h3>Próxima aplicación</h3><p>El catálogo permite añadir nuevos módulos.</p></div><span class="status-tag muted">PREPARADO</span></article>
+    </section>
+    <footer><span>ÓRBITA PERSONAL <b>·</b> 2026</span><span>El portal organiza tus apps; cada aplicación conserva su propio diseño.</span></footer>
+  </main>
+  <script src="./app-manifest.js" defer></script>
+  <script src="./portal.js" defer></script>
+</body>
+</html>
