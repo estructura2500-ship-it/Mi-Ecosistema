@@ -82,7 +82,12 @@
     if(data.access_token) { persistSession(data); if(allowed) await sync(); }
     return data;
   }
-  function signOut() {
+  async function signOut() {
+    try {
+      if(session?.access_token && validConfig(config)) {
+        await api('/auth/v1/logout?scope=local',{auth:true,method:'POST'});
+      }
+    }catch(err){console.warn('No se pudo revocar la sesión remota; se eliminará la sesión local.',err);}
     nativeRemove.call(localStorage,SESSION_KEY); session=null; conflictRemote=null;
     setStatus('Sesión cerrada. Tus datos locales permanecen en este navegador.');
     renderDialog();
@@ -210,7 +215,7 @@
     const configuredOK=validConfig(config);
     const conf='<h3>Configurar nube privada</h3><p class="ecs-muted">Este paso se hace una vez, después de crear el proyecto y activar las políticas de seguridad.</p><form id="ecs-config-form"><label>URL de Supabase<input name="url" type="url" placeholder="https://tu-proyecto.supabase.co" required></label><label>Clave pública (publishable/anon)<input name="key" autocomplete="off" required></label><button type="submit">Guardar conexión</button></form><p class="ecs-muted">Nunca ingreses aquí una clave service_role o secret. No se envían datos a GitHub.</p>';
     const login='<h3>Tu cuenta privada</h3><p class="ecs-muted">Inicia sesión para proteger y sincronizar tus registros.</p><form id="ecs-login-form"><label>Correo<input name="email" type="email" autocomplete="username" required></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" required></label><div class="ecs-actions"><button type="submit">Iniciar sesión</button><button type="button" id="ecs-register">Crear cuenta</button></div></form><button type="button" id="ecs-reconfigure" class="ecs-secondary">Cambiar proyecto Supabase</button>';
-    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button>'+(allowed?'<button id="ecs-history" type="button" class="ecs-secondary">Copias anteriores</button>':'<button id="ecs-overview" type="button" class="ecs-secondary">Estado de mis aplicaciones</button>')+'<button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div><div id="ecs-history-content"></div><div id="ecs-overview-content"></div>';
+    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button>'+(allowed?'<button id="ecs-history" type="button" class="ecs-secondary">Copias anteriores</button>':'<button id="ecs-overview" type="button" class="ecs-secondary">Estado de mis aplicaciones</button>')+'<button id="ecs-security" type="button" class="ecs-secondary">Seguridad</button><button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div><div id="ecs-security-content"></div><div id="ecs-history-content"></div><div id="ecs-overview-content"></div>';
     const conflicted=conflictRemote ? '<div class="ecs-warning"><strong>Dos versiones distintas</strong><p>Hay datos locales y en la nube. No reemplazaremos ninguno sin tu elección. Al recuperar la nube se descargará una copia de seguridad local antes del cambio.</p><div class="ecs-actions"><button id="ecs-use-cloud" type="button">Usar datos de la nube</button><button id="ecs-use-local" type="button" class="ecs-secondary">Subir mis datos locales</button></div></div>' : '';
     area.innerHTML= !configuredOK?conf:!session?login:account+conflicted;
     const form=area.querySelector('#ecs-config-form');
@@ -265,6 +270,36 @@
             }catch(err){setStatus('No se pudo restaurar: '+err.message);}
           }));
         }catch(err){setStatus('No se pudieron consultar las copias: '+err.message);target.textContent='';}
+      });
+      area.querySelector('#ecs-security')?.addEventListener('click',async()=>{
+        const target=area.querySelector('#ecs-security-content');
+        if(!target)return;
+        target.textContent='Revisando las sesiones de tu cuenta…';
+        try {
+          const records=await api('/rest/v1/rpc/my_security_sessions',{method:'POST',auth:true,body:{}});
+          const sessions=Array.isArray(records)?records:[];
+          const date=v=>v?new Date(v).toLocaleString('es-CO'):'Sin fecha';
+          const maskedIp=v=>{
+            const ip=String(v||'');
+            if(!ip)return 'IP no disponible';
+            if(ip.includes(':'))return ip.split(':').slice(0,2).join(':')+':…';
+            const parts=ip.split('.');return parts.length===4?parts.slice(0,2).join('.')+'.x.x':'IP protegida';
+          };
+          target.innerHTML='<h3>Seguridad de la cuenta</h3>'+
+            '<p class="ecs-muted">Sesiones registradas: '+sessions.length+'. No es un contador de visitantes del portal. Dos sesiones también pueden ser tuyas; estos datos no prueban quién utilizó el equipo.</p>'+
+            sessions.map(rec=>'<div class="ecs-archive"><div><strong>'+(rec.is_current?'● Sesión actual':'Otra sesión')+'</strong><div class="ecs-muted">Creada: '+escapeHtml(date(rec.created_at))+'<br>Última actividad: '+escapeHtml(date(rec.last_seen_at))+'<br>Red: '+escapeHtml(maskedIp(rec.ip_address))+'<br>'+escapeHtml(String(rec.device||'Navegador no identificado').slice(0,170))+'</div></div></div>').join('')+
+            '<p class="ecs-muted">El inicio de sesión se protege con contraseña. Cerrar sesiones no elimina datos guardados localmente en otros dispositivos. Los tokens de acceso antiguos pueden seguir activos hasta vencer.</p>'+
+            '<div class="ecs-actions"><button type="button" id="ecs-other-logouts">Cerrar otras sesiones</button><button type="button" id="ecs-refresh-security" class="ecs-secondary">Actualizar</button></div>';
+          target.querySelector('#ecs-refresh-security')?.addEventListener('click',()=>area.querySelector('#ecs-security')?.click());
+          target.querySelector('#ecs-other-logouts')?.addEventListener('click',async()=>{
+            if(!confirm('¿Cerrar todas las demás sesiones de Supabase? Tendrás que volver a iniciar sesión en esos dispositivos.'))return;
+            try {
+              await api('/auth/v1/logout?scope=others',{method:'POST',auth:true});
+              setStatus('Se solicitó cerrar las otras sesiones. Los tokens de acceso antiguos pueden permanecer válidos hasta su vencimiento.');
+              target.textContent='Las demás sesiones fueron revocadas. Pulsa «Seguridad» para consultar el estado actualizado.';
+            }catch(err){setStatus('No se pudieron cerrar otras sesiones: '+err.message);}
+          });
+        }catch(err){target.textContent='No fue posible obtener tus sesiones: '+err.message;}
       });
       area.querySelector('#ecs-signout')?.addEventListener('click',signOut);
       area.querySelector('#ecs-sync')?.addEventListener('click',()=>sync());
