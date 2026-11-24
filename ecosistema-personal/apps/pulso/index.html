@@ -384,7 +384,7 @@ function updateTimerDock(){
   '<small>⏱ <span id="timer-time">'+elapsed+'</span></small></div></div>'+
   '<div class="mini-actions"><button class="btn small" data-action="'+(t.running?'pauseTimer':'resumeTimer')+'" title="'+(t.running?'Pausar':'Continuar')+'">'+ic(t.running?'pause':'play',15)+'</button>'+
   '<button class="btn red small" data-action="endTimer" title="Finalizar y guardar">'+ic('stop',15)+'</button>'+
-  '<button class="btn small ghost" data-action="toggleMiniDock" title="'+(compact?'Mostrar controles':'Minimizar')+'">'+(compact?'▣':'—')+'</button></div>'+
+  '<button class="btn small ghost" data-action="openMiniPiP" title="Abrir ventana flotante sobre otras aplicaciones">↗</button>'+'<button class="btn small ghost" data-action="toggleMiniDock" title="'+(compact?'Mostrar controles':'Minimizar')+'">'+(compact?'▣':'—')+'</button></div>'+
   (!compact?'<div class="mini-tools"><button class="mini-mode" data-action="toggleMiniMode">'+(mode==='stopwatch'?'Ver cuenta regresiva':'Ver cronómetro')+'</button>'+
   '<label>Meta <select id="mini-duration" title="Duración del temporizador">'+
   presets.map(m=>'<option value="'+m+'" '+(Math.round(Number(t.goalSeconds||0)/60)===m?'selected':'')+'>'+m+' min</option>').join('')+
@@ -397,6 +397,45 @@ function updateTimerDock(){
    el.style.right='auto';el.style.bottom='auto';
  }
  publishPulsoMiniState();
+}
+
+/* Optional native always-on-top picture-in-picture window (desktop browsers supporting Document PiP).
+   The PULSO tab remains open; no task data is sent to an additional service. */
+let pulsoFloatingWindow=null;
+function paintPulsoFloatingWindow(){
+ const w=pulsoFloatingWindow;
+ if(!w||w.closed)return;
+ const title=w.document.getElementById('pip-task'),time=w.document.getElementById('pip-remaining'),elapsed=w.document.getElementById('pip-elapsed'),status=w.document.getElementById('pip-status'),toggle=w.document.getElementById('pip-toggle'),finish=w.document.getElementById('pip-finish');
+ if(!title||!time)return;
+ const t=db.timer;
+ title.textContent=t?.title||'Sin tarea activa';
+ const sec=t?timerElapsed():0;
+ const countdown=t?.displayMode!=='stopwatch'&&Number(t?.goalSeconds)>0;
+ time.textContent=t?(countdown?miniTimeText(Math.max(0,t.goalSeconds-sec)):miniTimeText(sec)):'—:—';
+ elapsed.textContent='⏱ '+miniTimeText(sec);
+ time.style.color=countdown&&sec>=t.goalSeconds?'#ff667f':'#f4f7ff';
+ status.textContent=t?(t.running?'En marcha':'Pausado')+(countdown?' · Tiempo restante':' · Cronómetro'):'Abre una tarea en PULSO';
+ if(toggle){toggle.disabled=!t;toggle.textContent=t?.running?'Pausar':'Continuar'}
+ if(finish)finish.disabled=!t;
+}
+async function openPulsoFloatingWindow(){
+ if(!('documentPictureInPicture' in window)){
+  toast('Este navegador no admite ventana flotante persistente. Utiliza la extensión PULSO para tus otras pestañas.');
+  return;
+ }
+ try{
+  if(pulsoFloatingWindow&&!pulsoFloatingWindow.closed){pulsoFloatingWindow.focus();return}
+  const w=await window.documentPictureInPicture.requestWindow({width:360,height:160});
+  pulsoFloatingWindow=w;
+  w.document.title='PULSO · Timer';
+  w.document.body.innerHTML='<style>*{box-sizing:border-box}body{margin:0;background:#101a2b;color:#f4f7ff;font:12px system-ui;padding:12px}#pip-main{display:flex;align-items:center;gap:11px}#pip-left{flex:1;min-width:0}#pip-task{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:750;font-size:13px}#pip-status{color:#a6b7d1;font-size:10px;margin-top:6px}#pip-right{text-align:right;min-width:82px}#pip-remaining{font:800 23px ui-monospace,monospace}#pip-elapsed{color:#a6b7d1;font:11px ui-monospace,monospace;margin-top:3px}.actions{display:flex;gap:8px;margin-top:10px}button{flex:1;border:1px solid #5473a0;background:#263e63;border-radius:7px;padding:7px 10px;color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.5;cursor:default}#pip-finish{background:#692d3d;border-color:#a75368}</style>'+
+   '<div id="pip-main"><div id="pip-left"><div id="pip-task">PULSO</div><div id="pip-status">Temporizador flotante</div></div><div id="pip-right"><div id="pip-remaining">—:—</div><div id="pip-elapsed">⏱ 00:00</div></div></div>'+
+   '<div class="actions"><button id="pip-toggle">Pausar</button><button id="pip-finish">Guardar sesión</button></div>';
+  w.document.getElementById('pip-toggle').addEventListener('click',()=>{if(db.timer){if(db.timer.running)timerPause();else timerResume();paintPulsoFloatingWindow()}});
+  w.document.getElementById('pip-finish').addEventListener('click',()=>{if(db.timer){timerEnd();try{window.focus()}catch(e){};paintPulsoFloatingWindow()}});
+  w.addEventListener('pagehide',()=>{pulsoFloatingWindow=null});
+  paintPulsoFloatingWindow();
+ }catch(e){toast('No se pudo abrir la ventana flotante. Comprueba que el navegador permita Picture-in-Picture.');}
 }
 function exportJSON(){let blob=new Blob([JSON.stringify({...db,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});download(blob,'PULSO_respaldo_'+nowDate()+'.json')}
 function download(blob,name){let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
@@ -496,6 +535,7 @@ document.getElementById('modal-wrap').addEventListener('click',e=>{let b=e.targe
 document.addEventListener('click',e=>{
  const b=e.target.closest('#timer-dock [data-action]');if(!b)return;
  if(b.dataset.action==='toggleMiniDock'){db.settings.widgetMinimized=!db.settings.widgetMinimized;save();updateTimerDock();}
+ if(b.dataset.action==='openMiniPiP')openPulsoFloatingWindow();
  if(b.dataset.action==='toggleMiniMode'&&db.timer){db.timer.displayMode=db.timer.displayMode==='stopwatch'?'countdown':'stopwatch';save();updateTimerDock();}
 });
 document.addEventListener('change',e=>{
@@ -540,7 +580,7 @@ document.addEventListener('pointerup',e=>{
 setTimeout(publishPulsoMiniState,500);
 
 // Refresh timer and clock without rerendering editable views.
-setInterval(()=>{let t=document.getElementById('timer-time');if(t&&db.timer)t.textContent=miniTimeText(timerElapsed());let remaining=document.getElementById('timer-remaining');if(remaining&&db.timer){remaining.textContent=db.timer.displayMode==='stopwatch'?miniTimeText(timerElapsed()):miniTimeText(miniTimerRemaining());remaining.classList.toggle('expired',!!db.timer.goalSeconds&&miniTimerRemaining()<=0);}checkMiniTimerAlert();let c=document.getElementById('live-clock');if(c)c.textContent=new Intl.DateTimeFormat('es-CO',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())},1000);
+setInterval(()=>{let t=document.getElementById('timer-time');if(t&&db.timer)t.textContent=miniTimeText(timerElapsed());let remaining=document.getElementById('timer-remaining');if(remaining&&db.timer){remaining.textContent=db.timer.displayMode==='stopwatch'?miniTimeText(timerElapsed()):miniTimeText(miniTimerRemaining());remaining.classList.toggle('expired',!!db.timer.goalSeconds&&miniTimerRemaining()<=0);}checkMiniTimerAlert();paintPulsoFloatingWindow();let c=document.getElementById('live-clock');if(c)c.textContent=new Intl.DateTimeFormat('es-CO',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())},1000);
 render();
 })();
 </script>
