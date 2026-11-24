@@ -580,7 +580,42 @@ function action(a,ds){const e=E();if(a==='new-event'){let name=prompt('Nombre pa
  else if(a==='print'){const prev=state.tab;state.tab='compras';render();window.print();state.tab=prev;render();}
 }
 document.addEventListener('click',ev=>{let major=ev.target.closest('[data-major]');if(major){state.tab=major.dataset.major;render();return;}let tab=ev.target.closest('[data-tab]');if(tab){const next=tab.dataset.tab;if(ASADO_TABS.includes(next)){state.tab='asado';state.asadoTab=next;}else{state.tab=next;}render();return;}let a=ev.target.closest('[data-action]');if(a)action(a.dataset.action,a.dataset);let check=ev.target.closest('[data-check-task]');if(check){let t=E().tasks.find(t=>t.id===check.dataset.checkTask);if(t){t.status='hecha';save();render();notify('Tarea terminada.');}}});
-document.addEventListener('input',ev=>{if(ev.target.id==='accountNotes'){E().accountNotes=ev.target.value;save();}});
+document.addEventListener('input',ev=>{
+ const el=ev.target;
+ if(el.id==='accountNotes'){E().accountNotes=el.value;save();return;}
+ if(el.id==='eventName'){E().name=el.value.trim()||'Evento';save();return;}
+ if(el.dataset.lType && el.tagName!=='SELECT'){
+   const obj=recordFor(el.dataset.lType,el.dataset.lId);
+   if(obj){
+     const field=el.dataset.lField;
+     if(field!=='date'||!el.value||/^\d{4}-\d{2}-\d{2}$/.test(el.value)){
+       obj[field]=field==='budget'?num(el.value):cleanText(el.value);
+       save();
+     }
+   }
+   return;
+ }
+ if(el.dataset.kind && el.type!=='checkbox' && el.tagName!=='SELECT'){
+   const e=E();
+   const obj=el.dataset.kind==='item'?e.items.find(x=>x.id===el.dataset.id):el.dataset.kind==='guest'?e.guests.find(x=>x.id===el.dataset.id):e.tasks.find(x=>x.id===el.dataset.id);
+   if(!obj)return;
+   const field=el.dataset.field;
+   if(['qty','price','contribution'].includes(field))obj[field]=num(el.value);
+   else if(field==='actual')obj[field]=el.value===''?'':num(el.value);
+   else obj[field]=el.value;
+   save();
+   return;
+ }
+ if(el.dataset.paymentField==='amount'){
+   const item=E().items.find(x=>x.id===el.dataset.itemId);
+   const payment=item?.payments?.[Number(el.dataset.paymentIndex)];
+   if(payment){
+     payment.amount=num(el.value);
+     item.actual=item.payments.reduce((total,p)=>total+num(p.amount),0);
+     save();
+   }
+ }
+});
 document.addEventListener('change',ev=>{let el=ev.target;if(el.id==='eventSelector'){state.activeId=el.value;state.tab='resumen';save();render();return;}if(el.dataset.presetActual){if(el.value==='budget'){const i=E().items.find(x=>x.id===el.dataset.presetActual);if(i){if(i.payments?.length){const rest=Math.max(0,num(i.qty)*num(i.price)-i.payments.slice(1).reduce((a,p)=>a+num(p.amount),0));i.payments[0].amount=rest;i.actual=i.payments.reduce((a,p)=>a+num(p.amount),0);save();render();}else updateRecord('item',i.id,'actual',Number((num(i.qty)*num(i.price)).toFixed(2)));notify('Se copió el presupuesto.');}}return;}if(el.dataset.paymentField){const i=E().items.find(x=>x.id===el.dataset.itemId),idx=Number(el.dataset.paymentIndex);if(!i||!i.payments?.[idx])return;const p=i.payments[idx];if(el.dataset.paymentField==='amount')p.amount=num(el.value);else {if(el.value&&i.payments.some((x,j)=>j!==idx&&x.guestId===el.value)){notify('Ese invitado ya está en el reparto.');render();return;}p.guestId=el.value;}i.actual=i.payments.reduce((a,p)=>a+num(p.amount),0);i.paidBy=i.payments.find(p=>p.guestId)?.guestId||'';save();render();return;}if(el.dataset.kind){let v=el.type==='checkbox'?el.checked:el.value;updateRecord(el.dataset.kind,el.dataset.id,el.dataset.field,v);return;}if(el.id==='eventName'){E().name=el.value.trim()||'Evento';save();render();}else if(el.id==='eventDate'){E().date=el.value;save();render();}});
 document.getElementById('importFile').addEventListener('change',async ev=>{let f=ev.target.files?.[0];if(!f)return;try{let obj=JSON.parse(await f.text());if(obj.format!=='BRASA'||!Array.isArray(obj.events)||!obj.events.length)throw Error('El archivo no es un respaldo de BRASA.');if(!confirm(`¿Restaurar ${obj.events.length} evento(s) y reemplazar los actuales?`))return;state.events=obj.events.map(normalizeEvent);if(obj.leisure)state.leisure=normalizeLeisure(obj.leisure);state.activeId=state.events.some(e=>e.id===obj.activeId)?obj.activeId:state.events[0].id;state.tab='resumen';save();render();notify('Respaldo restaurado.');}catch(err){alert('No se pudo restaurar: '+err.message);}finally{ev.target.value='';}});
 try{render();}catch(error){
