@@ -35,4 +35,4 @@ Crea `ecosistema-personal/apps/<id>/index.html`, registra su ficha en `app-manif
 
 ## Estado
 
-Tres respaldos privados cargados y verificados en Supabase: BRASA, Basketbrain y Juego de Honor Skill Lab. Las otras aplicaciones están preparadas para sincronizar sus datos locales cuando se abran con sesión iniciada. Todavía falta una prueba completa de recuperación desde un segundo dispositivo; no asumas que todos los datos multimedia se sincronizan.
+Cuatro respaldos privados cargados y verificados en Supabase: BRASA, Basketbrain, Juego de Honor Skill Lab y PULSO. Las otras aplicaciones están preparadas para sincronizar sus datos locales cuando se abran con sesión iniciada. Todavía falta una prueba completa de recuperación desde un segundo dispositivo; no asumas que todos los datos multimedia se sincronizan.
