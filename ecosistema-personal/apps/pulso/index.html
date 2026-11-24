@@ -162,7 +162,7 @@ body{background:radial-gradient(ellipse 850px 450px at 85% -15%,#142b682c,transp
 .pulso-zen-line:hover{background:rgba(98,144,219,.055)}
 .pulso-zen-check{height:16px!important;width:16px!important;min-width:16px!important;margin:0!important;flex:0 0 16px}
 .pulso-zen-title{border:none!important;background:transparent!important;color:var(--text)!important;text-align:left;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:570;cursor:pointer;padding:6px 0!important;display:block;outline-offset:3px}
-.pulso-zen-title:after{content:'⌄';float:right;font-size:14px;color:var(--muted2);opacity:.65;transition:transform .16s}
+.pulso-zen-title:after{content:none}
 .pulso-zen-row.is-open .pulso-zen-title:after{transform:rotate(180deg)}
 .pulso-zen-row.done .pulso-zen-title{text-decoration:line-through;opacity:.53}
 .pulso-zen-row.is-open{background:rgba(84,125,190,.055)!important}
@@ -387,8 +387,8 @@ function renderPlan(){return renderCompactPlan()}
 function quickLog(id){let t=taskFromId(id);if(!t)return;let inp=document.querySelector('[data-min="'+id+'"]'),minutes=num(inp?.value);if(minutes<=0||minutes>1440){toast('Escribe una duración válida (minutos).');return}db.sessions.push({id:aid(),date:ui.date,taskId:t.id,area:t.area,objective:t.objective||'',title:t.title,seconds:Math.round(minutes*60),note:'',kind:'manual',createdAt:new Date().toISOString()});save();render();toast(dur(minutes*60)+' registrados en '+t.area)}
 function timerElapsed(){let t=db.timer;if(!t)return 0;return num(t.elapsed)+(t.running?Math.max(0,Math.floor((Date.now()-t.startedAt)/1000)):0)}
 function startTimer(taskId=null, goalMinutes=null){
- if(ui.date!==nowDate()){toast('El cronómetro funciona para hoy. Cambia al día actual.');return}
- if(db.timer){toast('Ya hay un cronómetro activo. Detén ese registro primero.');return}
+ if(ui.date!==nowDate()){toast('El temporizador funciona para hoy. Cambia al día actual.');return}
+ if(db.timer){toast('Ya hay un temporizador activo. Detén ese registro primero.');return}
  const task=taskId?taskFromId(taskId):null;
  const minutes=Math.min(240,Math.max(1,Number(goalMinutes)||Number(task?.estimate)||15));
  db.timer={taskId:task?.id||null,area:task?.area||'Estructura',objective:task?.objective||'',title:task?.title||'Sesión libre',date:nowDate(),running:true,elapsed:0,startedAt:Date.now(),goalSeconds:Math.round(minutes*60),displayMode:'countdown',goalAlerted:false};
