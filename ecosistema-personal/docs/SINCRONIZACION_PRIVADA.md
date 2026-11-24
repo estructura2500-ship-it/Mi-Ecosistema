@@ -1,6 +1,6 @@
 # Sincronización privada de Mi Ecosistema
 
-Estado al 24 de noviembre de 2026: **base de datos activa, un usuario confirmado, RLS comprobado y tres respaldos privados cargados** (BRASA, Basketbrain, Juego de Honor). El cliente web usa exclusivamente una clave pública. BRASA tiene al menos dos revisiones sincronizadas. Faltan pruebas prácticas completas desde dos dispositivos y validar archivos multimedia de Patinaje/Calistenia.
+Estado al 24 de noviembre de 2026: **base de datos activa, un usuario confirmado, RLS comprobado y cuatro respaldos privados cargados** (BRASA, Basketbrain, Juego de Honor, PULSO). El cliente web usa exclusivamente una clave pública. BRASA tiene al menos dos revisiones sincronizadas. Faltan pruebas prácticas completas desde dos dispositivos y validar archivos multimedia de Patinaje/Calistenia.
 
 ## Arquitectura
 - GitHub Pages solo entrega las aplicaciones y el código público.
@@ -19,7 +19,7 @@ Estado al 24 de noviembre de 2026: **base de datos activa, un usuario confirmado
 - Para confirmar por correo el primer usuario, configura primero **Authentication → URL Configuration**: [configurar enlaces](https://supabase.com/dashboard/project/lrwiqqkcwsizrbtytbqw/auth/url-configuration). Site URL: `https://estructura2500-ship-it.github.io/Mi-Ecosistema/ecosistema-personal/`. Añade esta misma URL a los redirects permitidos.
 - Abre **☁ Mi cuenta** en el portal y crea una cuenta personal. Supabase puede enviar correo de verificación; nunca compartas contraseña en chats.
 - Verifica inicio de sesión y que los datos se guardan y restauran antes de confiar en la sincronización.
-- Cuenta de correo confirmada. Los respaldos privados de **BRASA, Basketbrain y Juego de Honor** ya están vinculados a esta cuenta **sin publicarlos en GitHub**.
+- Cuenta de correo confirmada. Los respaldos privados de **BRASA, Basketbrain, Juego de Honor y PULSO** ya están vinculados a esta cuenta **sin publicarlos en GitHub**.
 - Para uso estrictamente individual, desactiva los nuevos registros públicos en **Supabase → Authentication → Providers → Email**, después de comprobar que puedes iniciar sesión. Comprueba la configuración actual antes de hacer el cambio.
 
 La clave configurada en frontend es **publishable** y no otorga por sí sola acceso a registros; nunca pongas una `secret` o `service_role` en páginas públicas.
