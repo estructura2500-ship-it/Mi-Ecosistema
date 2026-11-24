@@ -7,7 +7,8 @@
     pulso: ['pulso_life_os_v2_datos_migrados_20261110'],
     'juego-de-honor': ['juego_de_honor_skill_lab_v6_state','juego_de_honor_skill_lab_v5_state','juego_de_honor_skill_lab_v4_state','juego_de_honor_skill_lab_v2_state'],
     calistenia: ['calistenia_skill_lab_gold_v1'],
-    'atlas-fisioterapia': ['atlas-movimiento-v1']
+    'atlas-fisioterapia': ['atlas-movimiento-v1'],
+    patinaje: ['skate-skill-lab-2026-v1']
   };
   const CONFIG_KEY = 'ecosistema_cloud_config_v1';
   const SESSION_KEY = 'ecosistema_cloud_session_v1';
