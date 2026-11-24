@@ -210,7 +210,7 @@
     const configuredOK=validConfig(config);
     const conf='<h3>Configurar nube privada</h3><p class="ecs-muted">Este paso se hace una vez, después de crear el proyecto y activar las políticas de seguridad.</p><form id="ecs-config-form"><label>URL de Supabase<input name="url" type="url" placeholder="https://tu-proyecto.supabase.co" required></label><label>Clave pública (publishable/anon)<input name="key" autocomplete="off" required></label><button type="submit">Guardar conexión</button></form><p class="ecs-muted">Nunca ingreses aquí una clave service_role o secret. No se envían datos a GitHub.</p>';
     const login='<h3>Tu cuenta privada</h3><p class="ecs-muted">Inicia sesión para proteger y sincronizar tus registros.</p><form id="ecs-login-form"><label>Correo<input name="email" type="email" autocomplete="username" required></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" required></label><div class="ecs-actions"><button type="submit">Iniciar sesión</button><button type="button" id="ecs-register">Crear cuenta</button></div></form><button type="button" id="ecs-reconfigure" class="ecs-secondary">Cambiar proyecto Supabase</button>';
-    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button>'+(allowed?'<button id="ecs-history" type="button" class="ecs-secondary">Copias anteriores</button>':'')+'<button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div><div id="ecs-history-content"></div>';
+    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button>'+(allowed?'<button id="ecs-history" type="button" class="ecs-secondary">Copias anteriores</button>':'<button id="ecs-overview" type="button" class="ecs-secondary">Estado de mis aplicaciones</button>')+'<button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div><div id="ecs-history-content"></div><div id="ecs-overview-content"></div>';
     const conflicted=conflictRemote ? '<div class="ecs-warning"><strong>Dos versiones distintas</strong><p>Hay datos locales y en la nube. No reemplazaremos ninguno sin tu elección. Al recuperar la nube se descargará una copia de seguridad local antes del cambio.</p><div class="ecs-actions"><button id="ecs-use-cloud" type="button">Usar datos de la nube</button><button id="ecs-use-local" type="button" class="ecs-secondary">Subir mis datos locales</button></div></div>' : '';
     area.innerHTML= !configuredOK?conf:!session?login:account+conflicted;
     const form=area.querySelector('#ecs-config-form');
@@ -222,6 +222,21 @@
       area.querySelector('#ecs-reconfigure').onclick=()=>{config={url:'',key:''};nativeRemove.call(localStorage,CONFIG_KEY);signOut();renderDialog();};
     }
     if(session){
+      area.querySelector('#ecs-overview')?.addEventListener('click',async()=>{
+        const target=area.querySelector('#ecs-overview-content');
+        if(!target)return;
+        target.textContent='Consultando el estado de tu almacenamiento privado…';
+        try{
+          const rows=await api('/rest/v1/app_snapshots?select=app_id,revision,updated_at&order=app_id.asc',{auth:true});
+          const known=[['brasa','BRASA'],['basketbrain','Basketbrain'],['juego-de-honor','Juego de Honor'],['pulso','PULSO'],['calistenia','Calistenia'],['patinaje','Patinaje'],['atlas-fisioterapia','ATLAS Fisioterapia']];
+          const map=new Map((rows||[]).map(row=>[row.app_id,row]));
+          target.innerHTML='<p class="ecs-muted">Solo se muestran tus registros. Las aplicaciones sin copia en la nube continúan guardando datos locales hasta que las abras e inicies sesión.</p>'+known.map(([key,label])=>{
+            const entry=map.get(key);
+            const status=entry?'☁ Copia en la nube · revisión '+Number(entry.revision):'○ Sin copia en la nube';
+            return '<div class="ecs-archive"><span>'+escapeHtml(label)+'</span><small>'+escapeHtml(status)+'</small></div>';
+          }).join('');
+        }catch(err){target.textContent='No se pudo consultar el estado: '+err.message;}
+      });
       area.querySelector('#ecs-history')?.addEventListener('click',async()=>{
         const target=area.querySelector('#ecs-history-content');
         if(!target)return;
