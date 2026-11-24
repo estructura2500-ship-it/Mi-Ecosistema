@@ -117,9 +117,20 @@
   }
   function exportEmergency(payload){
     if(!payload)return;
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    let backup = payload, prefix = 'Ecosistema_'+appId+'_copia_local_';
+    try {
+      const raw = payload.keys?.[APP_KEYS[appId]?.[0]];
+      if(appId==='brasa' && raw){
+        const data=JSON.parse(raw);
+        backup={format:'BRASA',version:6,exportedAt:new Date().toISOString(),events:data.events,activeId:data.activeId,leisure:data.leisure};
+        prefix='BRASA_respaldo_';
+      } else if(appId==='basketbrain' && raw){
+        backup=JSON.parse(raw);prefix='Basketbrain_respaldo_';
+      }
+    }catch(err){console.warn('La copia de emergencia usará el formato universal.',err);}
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
     const u=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=u;a.download='Ecosistema_'+appId+'_copia_local_'+new Date().toISOString().slice(0,10)+'.json';
+    a.href=u;a.download=prefix+new Date().toISOString().slice(0,10)+'.json';
     document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);
   }
   function applyRemote(row){
