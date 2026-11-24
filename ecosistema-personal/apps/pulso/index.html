@@ -180,11 +180,38 @@ body{background:radial-gradient(ellipse 850px 450px at 85% -15%,#142b682c,transp
 [data-theme="light"] .pulso-zen-line:hover{background:rgba(38,84,150,.06)}
 @media(max-width:620px){.pulso-zen-time{min-width:70px;font-size:9px}.pulso-zen-line{height:36px}.pulso-zen-title{font-size:12px}}
 
+
+/* Clásico PULSO: reloj izquierda / botones derecha, inspirado en el diseño original. */
+.timer-dock.pulso-floating-suite{position:fixed;z-index:90;right:16px;bottom:16px;top:auto;left:auto;width:min(367px,calc(100vw - 20px));max-width:min(367px,calc(100vw - 20px));padding:0;border:0;background:transparent;box-shadow:none;display:none;flex-direction:column;gap:8px;align-items:stretch}
+.timer-dock.pulso-floating-suite.visible{display:flex}
+.pulso-classic-card{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px 12px 15px;border:1px solid #5b8fe3;border-radius:17px;background:#142842;color:#f6f9ff;box-shadow:0 14px 45px rgba(0,0,0,.34);min-height:78px;font-family:system-ui,-apple-system,sans-serif}
+.pulso-classic-clock{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.pulso-classic-clock strong{font-size:24px;letter-spacing:-.9px;line-height:1.05;font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pulso-classic-caption{display:block;color:#a9bedb;font-size:10px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:155px;margin-top:6px}
+.pulso-classic-remaining{display:block;color:#8aabd4;font-size:9px;margin-top:1px}
+.pulso-classic-buttons{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.pulso-classic-buttons button{border-radius:9px;padding:8px 9px;border:1px solid #3c526d;color:#f8faff;background:#223858;font-weight:700;font-size:11px;display:flex;align-items:center;gap:5px;cursor:pointer}
+.pulso-classic-buttons .pulso-classic-save{background:#d9133e;border-color:#f15d75}
+.pulso-classic-buttons button:hover{filter:brightness(1.16)}
+.pulso-classic-more{position:absolute;right:8px;top:3px}
+.pulso-classic-more summary{font-size:11px;cursor:pointer;list-style:none;color:#a6bddb;padding:1px 3px;line-height:13px}
+.pulso-classic-more summary::-webkit-details-marker{display:none}
+.pulso-classic-more[open] .pulso-classic-menu{display:grid}
+.pulso-classic-menu{position:absolute;right:0;top:18px;width:258px;display:grid;gap:9px;padding:12px;border:1px solid #5878a4;border-radius:12px;background:#101d32;color:#fff;box-shadow:0 15px 34px #0009;font-size:11px;z-index:10}
+.pulso-classic-menu label{display:grid;gap:5px;color:#aabdd9}
+.pulso-classic-menu select{border:1px solid #455f80;border-radius:7px;padding:6px;background:#1a2c47;color:#f7f9ff;max-width:100%}
+.pulso-classic-menu-row{display:flex;flex-wrap:wrap;gap:6px}
+.pulso-classic-menu-row button{font:600 10px system-ui;border:1px solid #425d7c;border-radius:8px;padding:6px;background:#223856;color:#fff;cursor:pointer}
+.pulso-classic-menu-row button:hover{border-color:#9ec5f0}
+.pulso-general-clock{border-color:#6b7f96;background:#1c2539}
+.pulso-general-clock .pulso-classic-clock strong{color:#c7eaff}
+@media(max-width:440px){.timer-dock.pulso-floating-suite{bottom:82px;right:8px;width:min(350px,calc(100vw - 16px))}.pulso-classic-card{padding-left:10px;gap:5px}.pulso-classic-clock strong{font-size:19px}.pulso-classic-buttons button{padding:7px 6px;font-size:10px}.pulso-classic-caption{max-width:115px}}
+
 </style>
 <script src="../../core/private-cloud.js" data-ecosistema-app="pulso"></script>
 </head>
 <body>
-<div id="shell" class="app"><aside class="side"><div class="brand"><div class="brandmark"><svg viewBox="0 0 32 32" fill="none"><path d="M4 17h7l4-10 5 18 3-8h5" stroke="white" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><strong>PULSO<span style="color:var(--red)">.</span></strong><small>Skill Lab · Life OS</small></div></div><div class="side-label">Tu espacio</div><nav class="nav" id="sidebar"></nav><div class="side-bottom"><div class="levelcard"><div class="tiny">TU PROGRESO · XP</div><strong id="side-level">Nivel 1 · Inicio</strong><div class="levelbar"><i id="side-xp"></i></div><div class="tiny" id="side-xp-sub" style="margin-top:7px">0 / 250 XP</div></div><div class="side-foot">Tus datos quedan en este navegador. Haz respaldos periódicos.</div></div></aside><main class="main"><header class="topbar"><div><h1 id="page-title">Mi día</h1><div class="subheading" id="page-subtitle">Un espacio para decidir, actuar y mejorar.</div></div><div class="top-actions"><div class="date-nav"><button data-action="prevDate" aria-label="Día anterior">‹</button><input type="date" id="main-date" aria-label="Fecha del plan"><button data-action="nextDate" aria-label="Día siguiente">›</button></div><button class="btn ghost small" data-action="goToday">Hoy</button><button class="btn primary small" data-action="newTask">＋ Tarea</button><button class="btn ghost small" data-action="startTimer" title="Iniciar sesión libre de 15 minutos">⏱ Timer</button></div></header><div id="content"></div></main><nav class="mobile-nav" id="mobile-nav"></nav></div>
+<div id="shell" class="app"><aside class="side"><div class="brand"><div class="brandmark"><svg viewBox="0 0 32 32" fill="none"><path d="M4 17h7l4-10 5 18 3-8h5" stroke="white" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><strong>PULSO<span style="color:var(--red)">.</span></strong><small>Skill Lab · Life OS</small></div></div><div class="side-label">Tu espacio</div><nav class="nav" id="sidebar"></nav><div class="side-bottom"><div class="levelcard"><div class="tiny">TU PROGRESO · XP</div><strong id="side-level">Nivel 1 · Inicio</strong><div class="levelbar"><i id="side-xp"></i></div><div class="tiny" id="side-xp-sub" style="margin-top:7px">0 / 250 XP</div></div><div class="side-foot">Tus datos quedan en este navegador. Haz respaldos periódicos.</div></div></aside><main class="main"><header class="topbar"><div><h1 id="page-title">Mi día</h1><div class="subheading" id="page-subtitle">Un espacio para decidir, actuar y mejorar.</div></div><div class="top-actions"><div class="date-nav"><button data-action="prevDate" aria-label="Día anterior">‹</button><input type="date" id="main-date" aria-label="Fecha del plan"><button data-action="nextDate" aria-label="Día siguiente">›</button></div><button class="btn ghost small" data-action="goToday">Hoy</button><button class="btn primary small" data-action="newTask">＋ Tarea</button><button class="btn ghost small" data-action="startTimer" title="Iniciar sesión libre de 15 minutos">⏱ Timer</button><button class="btn ghost small" data-action="startGeneralStopwatch" title="Cronómetro independiente">⏱ Cronómetro</button></div></header><div id="content"></div></main><nav class="mobile-nav" id="mobile-nav"></nav></div>
 <div id="modal-wrap" class="modal-wrap"><div id="modal" class="modal" role="dialog" aria-modal="true"></div></div><div id="timer-dock" class="timer-dock"></div><div id="toast-wrap" class="toast-wrap" aria-live="polite"></div>
 <script>
 (() => { 'use strict';
@@ -236,7 +263,7 @@ const ui={page:'hoy',date:nowDate(),month:nowDate().slice(0,7),timeScope:'day',s
 let storageOK=true,toastTimer=0;
  // Persist the embedded migrated backup immediately, without touching the original PULSO storage key.
  save();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db));storageOK=true}catch(e){storageOK=false;toast('No se pudo guardar: el almacenamiento está lleno. Exporta un respaldo.')}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));storageOK=true;if(typeof publishPulsoStateV2==='function')setTimeout(publishPulsoStateV2,0)}catch(e){storageOK=false;toast('No se pudo guardar: el almacenamiento está lleno. Exporta un respaldo.')}}
 function templateTask(title,area,habitId,block,i,date){return {id:aid(),title,area,objective:'',block,order:i,estimate:0,fixedTime:'',required:true,habitId,done:false,createdAt:date}}
 function ensureDay(d){if(!db.days[d]){let tasks=MORNING.map((m,i)=>templateTask(m[0],m[1],m[2],'b1',i,d));tasks.push(templateTask('Desconexión digital y preparar el descanso','Salud','h_disconnect','b7',0,d));db.days[d]={tasks};save()}if(!Array.isArray(db.days[d].tasks))db.days[d].tasks=[];return db.days[d]}
 const dayTasks=d=>(db.days[d]?.tasks||[]);
@@ -410,41 +437,98 @@ function checkMiniTimerAlert(){
    }
  }catch(e){/* Browsers can block sound when the page has no gesture permission. */}
 }
-function updateTimerDock(){
- const t=db.timer,el=document.getElementById('timer-dock');
- el.classList.add('pulso-mini-dock');
- if(!t){el.classList.remove('visible');el.innerHTML='';publishPulsoMiniState();return}
- el.classList.add('visible');
- const compact=!!db.settings.widgetMinimized;
- el.classList.toggle('mini-collapsed',compact);
- const countdown=Number(t.goalSeconds)>0;
- const remaining=miniTimeText(miniTimerRemaining());
- const elapsed=miniTimeText(timerElapsed());
- const mode=t.displayMode||'countdown';
- const primary=mode==='stopwatch'?elapsed:countdown?remaining:elapsed;
- const primaryLabel=mode==='stopwatch'?'Cronómetro':'Restante';
- const presets=[5,15,25,45,60];
- el.innerHTML='<div class="mini-main"><button class="mini-grip" aria-label="Mover panel flotante" title="Arrastrar para mover">⠿</button>'+
-  '<div class="mini-task" title="'+E(t.title)+'"><strong>'+E(t.title)+'</strong><small>'+E(primaryLabel)+(t.goalAlerted?' · Tiempo cumplido':'')+'</small></div>'+
-  '<div class="mini-clocks"><strong id="timer-remaining" class="'+(countdown&&miniTimerRemaining()<=0?'expired':'')+'">'+primary+'</strong>'+
-  '<small>⏱ <span id="timer-time">'+elapsed+'</span></small></div></div>'+
-  '<div class="mini-actions"><button class="btn small" data-action="'+(t.running?'pauseTimer':'resumeTimer')+'" title="'+(t.running?'Pausar':'Continuar')+'">'+ic(t.running?'pause':'play',15)+'</button>'+
-  '<button class="btn red small" data-action="endTimer" title="Finalizar y guardar">'+ic('stop',15)+'</button>'+
-  '<button class="btn small ghost" data-action="openMiniPiP" title="Abrir ventana flotante sobre otras aplicaciones">↗</button>'+'<button class="btn small ghost" data-action="toggleMiniDock" title="'+(compact?'Mostrar controles':'Minimizar')+'">'+(compact?'▣':'—')+'</button></div>'+
-  (!compact?'<div class="mini-tools"><button class="mini-mode" data-action="toggleMiniMode">'+(mode==='stopwatch'?'Ver cuenta regresiva':'Ver cronómetro')+'</button>'+
-  '<label>Meta <select id="mini-duration" title="Duración del temporizador">'+
-  presets.map(m=>'<option value="'+m+'" '+(Math.round(Number(t.goalSeconds||0)/60)===m?'selected':'')+'>'+m+' min</option>').join('')+
-  '<option value="custom" '+(!presets.includes(Math.round(Number(t.goalSeconds||0)/60))?'selected':'')+'>Personalizar…</option></select></label></div>':'');
- el.setAttribute('aria-label','Temporizador de '+t.title);
- const pos=db.settings.widgetPosition;
- if(pos&&Number.isFinite(Number(pos.left))&&Number.isFinite(Number(pos.top))){
-   el.style.left=Math.max(8,Math.min(window.innerWidth-200,Number(pos.left)))+'px';
-   el.style.top=Math.max(8,Math.min(window.innerHeight-65,Number(pos.top)))+'px';
-   el.style.right='auto';el.style.bottom='auto';
- }
- publishPulsoMiniState();
-}
 
+/* El temporizador conserva el formato original. El cronómetro general es independiente. */
+function generalStopwatchElapsed(){
+ const t=db.stopwatch;if(!t)return 0;
+ return Math.max(0,num(t.elapsed)+(t.running?Math.floor(Math.max(0,Date.now()-num(t.startedAt))/1000):0));
+}
+function startGeneralStopwatch(){
+ if(db.stopwatch){toast('El cronómetro general ya está activo.');return}
+ db.stopwatch={title:'Cronómetro general',area:'Estructura',date:nowDate(),running:true,elapsed:0,startedAt:Date.now()};
+ save();updateTimerDock();toast('Cronómetro general iniciado');
+}
+function pauseGeneralStopwatch(){const t=db.stopwatch;if(!t)return;t.elapsed=generalStopwatchElapsed();t.running=false;save();updateTimerDock()}
+function resumeGeneralStopwatch(){const t=db.stopwatch;if(!t)return;t.startedAt=Date.now();t.running=true;save();updateTimerDock()}
+function saveGeneralStopwatch(){
+ const t=db.stopwatch;if(!t)return;
+ const seconds=generalStopwatchElapsed();
+ if(seconds<15&&!confirm('Solo llevas '+seconds+' segundos. ¿Guardar este cronómetro?'))return;
+ db.sessions.push({id:aid(),date:t.date||nowDate(),taskId:null,area:t.area||'Estructura',objective:'',title:'Cronómetro general',seconds:Math.max(1,seconds),note:'',kind:'stopwatch',createdAt:new Date().toISOString()});
+ db.stopwatch=null;save();render();toast('Cronómetro guardado');
+}
+function resetPulsoSession(kind){
+ if(!db[kind])return;
+ if(!confirm('¿Reiniciar '+(kind==='timer'?'este temporizador':'el cronómetro general')+' desde cero?'))return;
+ db[kind].elapsed=0;db[kind].startedAt=Date.now();db[kind].running=true;
+ if(kind==='timer')db[kind].goalAlerted=false;
+ save();updateTimerDock();toast('Tiempo reiniciado');
+}
+function discardPulsoSession(kind){
+ if(!db[kind]||!confirm('¿Descartar este tiempo sin registrarlo?'))return;
+ db[kind]=null;save();render();toast('Tiempo descartado sin registrar');
+}
+function pulsoSessionTaskSelector(t){
+ const all=dayTasks(nowDate()).slice().sort((a,b)=>num(a.order)-num(b.order));
+ return '<select id="pulso-choose-timer-task" aria-label="Asignar actividad al temporizador">'+
+ '<option value="">Sesión libre</option>'+
+ all.map(x=>'<option value="'+E(x.id)+'" '+(x.id===t.taskId?'selected':'')+'>'+E(x.title)+'</option>').join('')+
+ '</select>';
+}
+function updateTimerDock(){
+ const el=document.getElementById('timer-dock'), t=db.timer, w=db.stopwatch;
+ el.classList.remove('pulso-mini-dock','mini-collapsed');
+ el.classList.add('pulso-floating-suite');
+ el.style.left='';el.style.top='';el.style.right='';el.style.bottom='';
+ el.classList.toggle('visible',!!(t||w));
+ if(!t&&!w){el.innerHTML='';publishPulsoMiniState();publishPulsoStateV2();return}
+ const parts=[];
+ if(t){
+  const secs=timerElapsed(),remain=miniTimerRemaining();
+  parts.push('<section class="pulso-classic-card" aria-label="Temporizador de actividad">'+
+   '<div class="pulso-classic-clock"><strong id="timer-time">'+clockFmt(secs)+'</strong>'+
+    '<span class="pulso-classic-caption" title="'+E(t.title)+'">'+E(t.title)+'</span>'+
+    '<span class="pulso-classic-remaining" id="timer-remaining">Restan '+miniTimeText(remain)+'</span></div>'+
+   '<div class="pulso-classic-buttons">'+
+    '<button type="button" class="pulso-classic-pause" data-action="'+(t.running?'pauseTimer':'resumeTimer')+'">'+ic(t.running?'pause':'play',13)+' '+(t.running?'Pausar':'Seguir')+'</button>'+
+    '<button type="button" class="pulso-classic-save" data-action="endTimer">'+ic('stop',12)+' Guardar</button>'+
+   '</div><details class="pulso-classic-more"><summary title="Opciones de temporizador">⋯</summary>'+
+   '<div class="pulso-classic-menu"><label>Actividad '+pulsoSessionTaskSelector(t)+'</label><label>Duración '+
+    '<select id="mini-duration"><option value="5" '+(Math.round(num(t.goalSeconds)/60)===5?'selected':'')+'>5 min</option>'+
+    '<option value="15" '+(Math.round(num(t.goalSeconds)/60)===15?'selected':'')+'>15 min</option>'+
+    '<option value="25" '+(Math.round(num(t.goalSeconds)/60)===25?'selected':'')+'>25 min</option>'+
+    '<option value="45" '+(Math.round(num(t.goalSeconds)/60)===45?'selected':'')+'>45 min</option>'+
+    '<option value="60" '+(Math.round(num(t.goalSeconds)/60)===60?'selected':'')+'>60 min</option>'+
+    '<option value="custom" '+(![5,15,25,45,60].includes(Math.round(num(t.goalSeconds)/60))?'selected':'')+'>Personalizada…</option></select></label>'+
+    '<div class="pulso-classic-menu-row"><button type="button" data-action="resetPulsoTimer">Reiniciar</button>'+
+    '<button type="button" data-action="discardPulsoTimer">Borrar sin guardar</button>'+
+    '<button type="button" data-action="openMiniPiP">↗ Ventana aparte</button></div></div></details></section>');
+ }
+ if(w){
+  parts.push('<section class="pulso-classic-card pulso-general-clock" aria-label="Cronómetro general">'+
+   '<div class="pulso-classic-clock"><strong id="pulso-stopwatch-time">'+clockFmt(generalStopwatchElapsed())+'</strong>'+
+    '<span class="pulso-classic-caption">Cronómetro general</span></div>'+
+   '<div class="pulso-classic-buttons">'+
+    '<button type="button" class="pulso-classic-pause" data-action="'+(w.running?'pauseGeneralStopwatch':'resumeGeneralStopwatch')+'">'+ic(w.running?'pause':'play',13)+' '+(w.running?'Pausar':'Seguir')+'</button>'+
+    '<button type="button" class="pulso-classic-save" data-action="saveGeneralStopwatch">'+ic('stop',12)+' Guardar</button>'+
+   '</div><details class="pulso-classic-more"><summary title="Opciones del cronómetro">⋯</summary>'+
+    '<div class="pulso-classic-menu"><label>Área para registrar la sesión<select id="pulso-stopwatch-area">'+
+     db.areas.map(a=>'<option value="'+E(a)+'" '+(a===(w.area||'Estructura')?'selected':'')+'>'+E(a)+'</option>').join('')+
+    '</select></label><div class="pulso-classic-menu-row"><button type="button" data-action="resetGeneralStopwatch">Reiniciar</button>'+
+    '<button type="button" data-action="discardGeneralStopwatch">Borrar sin guardar</button></div></div></details></section>');
+ }
+ el.innerHTML=parts.join('');
+ publishPulsoMiniState();publishPulsoStateV2();
+}
+function publishPulsoStateV2(){
+ const summarize=(t,kind)=>t?{kind,title:kind==='timer'?String(t.title||'Temporizador'): 'Cronómetro general',
+ running:!!t.running,elapsed:num(t.elapsed),startedAt:num(t.startedAt),goalSeconds:kind==='timer'?num(t.goalSeconds):0,
+ taskId:kind==='timer'?(t.taskId||null):null,area:String(t.area||'Estructura'),date:t.date||nowDate()}:null;
+ const state={version:2,date:nowDate(),sessionView:db.settings.sessionView||'timer',
+ timer:summarize(db.timer,'timer'),stopwatch:summarize(db.stopwatch,'stopwatch'),
+ tasks:dayTasks(nowDate()).map(t=>({id:t.id,title:t.title,area:t.area,estimate:num(t.estimate),done:!!t.done,required:!!t.required}))};
+ try{window.postMessage({source:'PULSO_APP_TIMER_V2',state},location.origin)}catch(e){}
+}
 /* Optional native always-on-top picture-in-picture window (desktop browsers supporting Document PiP).
    The PULSO tab remains open; no task data is sent to an additional service. */
 let pulsoFloatingWindow=null;
@@ -578,6 +662,60 @@ root.addEventListener('input',e=>{if(e.target.id==='area-search'){ui.areaSearch=
 document.getElementById('modal-wrap').addEventListener('click',e=>{let b=e.target.closest('[data-action="deleteReward"]');if(b){let r=db.rewards.find(x=>x.id===b.dataset.id);if(r&&confirm('¿Eliminar premio «'+r.name+'»? Los canjes históricos no se devuelven.')){db.rewards=db.rewards.filter(x=>x.id!==r.id);save();closeModal();render()}}});
 
 
+
+root.addEventListener('click',ev=>{const btn=ev.target.closest('[data-action="startGeneralStopwatch"]');if(btn)startGeneralStopwatch()});
+document.addEventListener('click',ev=>{
+ const btn=ev.target.closest('#timer-dock [data-action]');if(!btn)return;
+ switch(btn.dataset.action){
+  case 'pauseGeneralStopwatch':pauseGeneralStopwatch();break;
+  case 'resumeGeneralStopwatch':resumeGeneralStopwatch();break;
+  case 'saveGeneralStopwatch':saveGeneralStopwatch();break;
+  case 'resetGeneralStopwatch':resetPulsoSession('stopwatch');break;
+  case 'discardGeneralStopwatch':discardPulsoSession('stopwatch');break;
+  case 'resetPulsoTimer':resetPulsoSession('timer');break;
+  case 'discardPulsoTimer':discardPulsoSession('timer');break;
+ }
+});
+document.addEventListener('change',ev=>{
+ if(ev.target.id==='pulso-choose-timer-task'&&db.timer){
+  const task=ev.target.value?dayTasks(nowDate()).find(t=>t.id===ev.target.value):null;
+  db.timer.taskId=task?.id||null;
+  db.timer.title=task?.title||'Sesión libre';
+  db.timer.area=task?.area||'Estructura';
+  db.timer.objective=task?.objective||'';
+  save();updateTimerDock();
+ }
+ if(ev.target.id==='pulso-stopwatch-area'&&db.stopwatch){
+  db.stopwatch.area=ev.target.value;save();
+ }
+});
+// El cronómetro general no inicia al activar una tarea: es un reloj independiente.
+window.addEventListener('message',ev=>{
+ if(ev.source!==window||ev.origin!==location.origin||ev.data?.source!=='PULSO_FLOAT_EXTENSION_V2')return;
+ const a=ev.data.action,k=ev.data.kind==='stopwatch'?'stopwatch':'timer';
+ if(a==='request-state'){publishPulsoStateV2();return}
+ if(a==='toggle-task'){
+  const task=dayTasks(nowDate()).find(t=>t.id===ev.data.id);
+  if(task){const previousDate=ui.date;ui.date=nowDate();toggleTask(task.id);ui.date=previousDate;publishPulsoStateV2();}
+  return;
+ }
+ if(a==='start-timer'){if(!db.timer)startTimer(ev.data.id||null);return}
+ if(a==='start-stopwatch'){if(!db.stopwatch)startGeneralStopwatch();return}
+ if(a==='pause-session'){k==='timer'?timerPause():pauseGeneralStopwatch();return}
+ if(a==='resume-session'){k==='timer'?timerResume():resumeGeneralStopwatch();return}
+ if(a==='finish-session'){k==='timer'?timerEnd():saveGeneralStopwatch();return}
+ if(a==='restart-session'){resetPulsoSession(k);return}
+ if(a==='discard-session'){discardPulsoSession(k);return}
+ if(a==='set-timer-minutes'&&db.timer){setMiniDuration(ev.data.minutes);return}
+ if(a==='assign-task'&&db.timer&&k==='timer'){
+  const task=dayTasks(nowDate()).find(t=>t.id===ev.data.id);
+  db.timer.taskId=task?.id||null;db.timer.title=task?.title||'Sesión libre';
+  db.timer.area=task?.area||'Estructura';db.timer.objective=task?.objective||'';
+  save();updateTimerDock();return;
+ }
+ if(a==='show-timer'||a==='show-stopwatch'){db.settings.sessionView=a==='show-timer'?'timer':'stopwatch';save();publishPulsoStateV2()}
+});
+
 // Mini timer: visible in PULSO and controllable from the optional browser extension.
 document.addEventListener('click',e=>{
  const b=e.target.closest('#timer-dock [data-action]');if(!b)return;
@@ -627,7 +765,7 @@ document.addEventListener('pointerup',e=>{
 setTimeout(publishPulsoMiniState,500);
 
 // Refresh timer and clock without rerendering editable views.
-setInterval(()=>{let t=document.getElementById('timer-time');if(t&&db.timer)t.textContent=miniTimeText(timerElapsed());let remaining=document.getElementById('timer-remaining');if(remaining&&db.timer){remaining.textContent=db.timer.displayMode==='stopwatch'?miniTimeText(timerElapsed()):miniTimeText(miniTimerRemaining());remaining.classList.toggle('expired',!!db.timer.goalSeconds&&miniTimerRemaining()<=0);}checkMiniTimerAlert();paintPulsoFloatingWindow();let c=document.getElementById('live-clock');if(c)c.textContent=new Intl.DateTimeFormat('es-CO',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())},1000);
+setInterval(()=>{let t=document.getElementById('timer-time');if(t&&db.timer)t.textContent=clockFmt(timerElapsed());let remaining=document.getElementById('timer-remaining');if(remaining&&db.timer){remaining.textContent='Restan '+miniTimeText(miniTimerRemaining());}let g=document.getElementById('pulso-stopwatch-time');if(g&&db.stopwatch)g.textContent=clockFmt(generalStopwatchElapsed());checkMiniTimerAlert();paintPulsoFloatingWindow();let c=document.getElementById('live-clock');if(c)c.textContent=new Intl.DateTimeFormat('es-CO',{hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date())},1000);
 render();
 })();
 </script>
