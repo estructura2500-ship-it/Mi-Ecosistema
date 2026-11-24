@@ -1,6 +1,6 @@
 # Sincronización privada de Mi Ecosistema
 
-Estado: **cliente publicado; base de datos pendiente de conectar**. Esto no significa que tus registros ya estén en la nube.
+Estado al 24 de noviembre de 2026: **base de datos creada y reglas RLS instaladas**. El cliente web está configurado con la URL del proyecto y una clave pública. Falta crear y validar el usuario privado, verificar la sincronización desde dos sesiones y cargar los registros privados de BRASA. No se han insertado registros privados.
 
 ## Arquitectura
 - GitHub Pages solo entrega las aplicaciones y el código público.
@@ -10,16 +10,19 @@ Estado: **cliente publicado; base de datos pendiente de conectar**. Esto no sign
 - Cuando no hay cuenta configurada, las apps continúan guardando localmente. Nunca se envían datos personales a GitHub.
 - Las copias JSON antiguas son privadas y NO deben subirse al repositorio. **Finanzas está excluida**.
 
-## Activar el backend (una vez)
-1. Conecta **Supabase** en ChatGPT y crea/elige un proyecto propio en la cuenta que controlas.
-2. En SQL Editor ejecuta el archivo `core/supabase-schema.sql`. Comprueba que **RLS esté activado** en `public.app_snapshots`.
-3. En Authentication habilita el inicio de sesión por correo. Configura como Site URL `https://estructura2500-ship-it.github.io/Mi-Ecosistema/`. Si hay confirmación de correo habilitada, comprueba que los enlaces de confirmación estén configurados.
-4. Después de crear tu cuenta, **deshabilita el registro público de usuarios** en Authentication si solo utilizarás tú el ecosistema; de lo contrario, terceros podrían crear cuentas aisladas y consumir recursos del proyecto.
-5. En el portal, abre **Mi cuenta**. Ingresa tu Project URL (debe terminar en `.supabase.co`) y únicamente la clave **publishable** o **anon** del proyecto, nunca la secret o service_role.
-6. Crea tu cuenta o inicia sesión. El acceso es común a todas las apps en este mismo sitio.
-7. Cuando se compruebe la conexión, se puede incorporar en la base de datos el respaldo privado de BRASA que ya proporcionaste. **No incrustes registros personales en ningún HTML público.**
+## Proyecto creado
 
-La URL y la clave *pública* del proyecto pueden ponerse después como configuración predeterminada en `core/private-cloud.js`; una clave privada **jamás**.
+- Supabase: [Mi Ecosistema Privado](https://supabase.com/dashboard/project/lrwiqqkcwsizrbtytbqw)
+- Región: São Paulo (`sa-east-1`)
+- Base: `public.app_snapshots`; RLS activado; políticas independientes por usuario; RPC `save_app_snapshot` con control de revisión
+- Portal: [Mi Ecosistema](https://estructura2500-ship-it.github.io/Mi-Ecosistema/ecosistema-personal/)
+- Para confirmar por correo el primer usuario, configura primero **Authentication → URL Configuration**: [configurar enlaces](https://supabase.com/dashboard/project/lrwiqqkcwsizrbtytbqw/auth/url-configuration). Site URL: `https://estructura2500-ship-it.github.io/Mi-Ecosistema/ecosistema-personal/`. Añade esta misma URL a los redirects permitidos.
+- Abre **☁ Mi cuenta** en el portal y crea una cuenta personal. Supabase puede enviar correo de verificación; nunca compartas contraseña en chats.
+- Verifica inicio de sesión y que los datos se guardan y restauran antes de confiar en la sincronización.
+- Una vez creada tu cuenta, se podrá cargar el respaldo BRASA a esa cuenta **sin publicar los registros en GitHub**.
+- Para un ecosistema de uso individual, desactiva los nuevos registros públicos después de crear tu cuenta, si lo deseas.
+
+La clave configurada en frontend es **publishable** y no otorga por sí sola acceso a registros; nunca pongas una `secret` o `service_role` en páginas públicas.
 
 ## Cómo se sincroniza
 - Los datos continúan guardándose inmediatamente en el navegador como antes.
