@@ -35,7 +35,13 @@
   function validConfig(c) {
     try {
       const u = new URL(c.url);
-      return u.protocol === 'https:' && /^[a-z0-9-]+\.supabase\.co$/.test(u.hostname) && !u.username && !u.password && !u.pathname.replace(/\//g,'') && !!c.key && c.key.length > 12;
+      const key = String(c.key || '');
+      let isPublic = key.startsWith('sb_publishable_');
+      if (!isPublic && key.startsWith('eyJ')) {
+        const payload = JSON.parse(atob((key.split('.')[1] || '').replace(/-/g,'+').replace(/_/g,'/')));
+        isPublic = payload.role === 'anon';
+      }
+      return u.protocol === 'https:' && /^[a-z0-9-]+\.supabase\.co$/.test(u.hostname) && !u.username && !u.password && !u.pathname.replace(/\//g,'') && isPublic;
     } catch { return false; }
   }
   function origin() { return config.url.replace(/\/+$/,''); }
