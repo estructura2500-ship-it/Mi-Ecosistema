@@ -540,7 +540,7 @@ function paintPulsoFloatingWindow(){
  const t=db.timer;
  title.textContent=t?.title||'Sin tarea activa';
  const sec=t?timerElapsed():0;
- const countdown=t?.displayMode!=='stopwatch'&&Number(t?.goalSeconds)>0;
+ const countdown=Number(t?.goalSeconds)>0;
  time.textContent=t?(countdown?miniTimeText(Math.max(0,t.goalSeconds-sec)):miniTimeText(sec)):'—:—';
  elapsed.textContent='⏱ '+miniTimeText(sec);
  time.style.color=countdown&&sec>=t.goalSeconds?'#ff667f':'#f4f7ff';
@@ -696,7 +696,13 @@ window.addEventListener('message',ev=>{
  if(a==='request-state'){publishPulsoStateV2();return}
  if(a==='toggle-task'){
   const task=dayTasks(nowDate()).find(t=>t.id===ev.data.id);
-  if(task){const previousDate=ui.date;ui.date=nowDate();toggleTask(task.id);ui.date=previousDate;publishPulsoStateV2();}
+  if(task){
+   task.done=!task.done;
+   task.completedAt=task.done?new Date().toISOString():null;
+   save();
+   if(ui.date===nowDate())render();
+   publishPulsoStateV2();
+  }
   return;
  }
  if(a==='start-timer'){if(!db.timer)startTimer(ev.data.id||null);return}
