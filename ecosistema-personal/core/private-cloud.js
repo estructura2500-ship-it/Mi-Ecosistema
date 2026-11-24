@@ -115,6 +115,7 @@
     const revision=await api('/rest/v1/rpc/save_app_snapshot',{auth:true,method:'POST',body:{p_app_id:appId,p_payload:payload,p_expected_revision:expected}});
     saveMeta(Number(revision),payload);
     setStatus('Sincronizado con tu cuenta · '+new Date().toLocaleTimeString('es-CO'));
+    return Number(revision);
   }
   function exportEmergency(payload){
     if(!payload)return;
@@ -209,7 +210,7 @@
     const configuredOK=validConfig(config);
     const conf='<h3>Configurar nube privada</h3><p class="ecs-muted">Este paso se hace una vez, después de crear el proyecto y activar las políticas de seguridad.</p><form id="ecs-config-form"><label>URL de Supabase<input name="url" type="url" placeholder="https://tu-proyecto.supabase.co" required></label><label>Clave pública (publishable/anon)<input name="key" autocomplete="off" required></label><button type="submit">Guardar conexión</button></form><p class="ecs-muted">Nunca ingreses aquí una clave service_role o secret. No se envían datos a GitHub.</p>';
     const login='<h3>Tu cuenta privada</h3><p class="ecs-muted">Inicia sesión para proteger y sincronizar tus registros.</p><form id="ecs-login-form"><label>Correo<input name="email" type="email" autocomplete="username" required></label><label>Contraseña<input name="password" type="password" autocomplete="current-password" minlength="8" required></label><div class="ecs-actions"><button type="submit">Iniciar sesión</button><button type="button" id="ecs-register">Crear cuenta</button></div></form><button type="button" id="ecs-reconfigure" class="ecs-secondary">Cambiar proyecto Supabase</button>';
-    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button><button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div>';
+    const account='<h3>Cuenta conectada</h3><p>'+escapeHtml(session?.user?.email||'Cuenta privada')+'</p><p class="ecs-muted">'+(allowed?'Aplicación: '+escapeHtml(appId):'Abre una aplicación para sincronizar sus registros.')+'</p><div class="ecs-actions"><button id="ecs-sync" type="button" '+(allowed?'':'disabled')+'>Sincronizar ahora</button>'+(allowed?'<button id="ecs-history" type="button" class="ecs-secondary">Copias anteriores</button>':'')+'<button id="ecs-signout" type="button" class="ecs-secondary">Cerrar sesión</button></div><div id="ecs-history-content"></div>';
     const conflicted=conflictRemote ? '<div class="ecs-warning"><strong>Dos versiones distintas</strong><p>Hay datos locales y en la nube. No reemplazaremos ninguno sin tu elección. Al recuperar la nube se descargará una copia de seguridad local antes del cambio.</p><div class="ecs-actions"><button id="ecs-use-cloud" type="button">Usar datos de la nube</button><button id="ecs-use-local" type="button" class="ecs-secondary">Subir mis datos locales</button></div></div>' : '';
     area.innerHTML= !configuredOK?conf:!session?login:account+conflicted;
     const form=area.querySelector('#ecs-config-form');
@@ -221,6 +222,35 @@
       area.querySelector('#ecs-reconfigure').onclick=()=>{config={url:'',key:''};nativeRemove.call(localStorage,CONFIG_KEY);signOut();renderDialog();};
     }
     if(session){
+      area.querySelector('#ecs-history')?.addEventListener('click',async()=>{
+        const target=area.querySelector('#ecs-history-content');
+        if(!target)return;
+        target.textContent='Buscando copias privadas…';
+        try {
+          const rows=await api('/rest/v1/app_snapshot_history?app_id=eq.'+encodeURIComponent(appId)+'&select=backup_day,revision,payload&order=backup_day.desc&limit=14',{auth:true});
+          if(!rows?.length){target.textContent='Aún no hay copias anteriores. Se crearán automáticamente al actualizar datos y se conservará un máximo de 14 días con cambios.';return;}
+          target.innerHTML='<p class="ecs-muted">Copias privadas disponibles (máximo 14 fechas). Recuperar una copia reemplaza la versión actual solo después de tu confirmación.</p>'+rows.map((backup,index)=>'<div class="ecs-archive"><span>'+escapeHtml(backup.backup_day)+' · v'+Number(backup.revision)+'</span><button class="ecs-secondary" data-ecs-download="'+index+'" type="button">Descargar</button><button data-ecs-restore="'+index+'" type="button">Restaurar</button></div>').join('');
+          target.querySelectorAll('[data-ecs-download]').forEach(button=>button.addEventListener('click',()=>{
+            const backup=rows[Number(button.dataset.ecsDownload)];
+            if(backup?.payload?.schema===1 && backup?.payload?.keys)exportEmergency(backup.payload);
+          }));
+          target.querySelectorAll('[data-ecs-restore]').forEach(button=>button.addEventListener('click',async()=>{
+            const backup=rows[Number(button.dataset.ecsRestore)];
+            if(!backup?.payload?.keys || backup.payload.schema!==1){setStatus('La copia seleccionada no tiene un formato compatible.');return;}
+            if(!confirm('¿Restaurar los registros del '+backup.backup_day+' en '+appId+'? Esto reemplazará la versión actual en la nube y en este navegador.'))return;
+            const local=getSnapshot();
+            if(local)exportEmergency(local);
+            setStatus('Restaurando copia privada…');
+            try {
+              const latest=await remoteGet();
+              if(!latest)throw new Error('No existe una versión actual para restaurar.');
+              if(local && digest(local)!==digest(latest.payload) && !confirm('Tus datos del navegador difieren de la nube. Ya se intentó descargar una copia local. ¿Deseas continuar?'))return;
+              const revision=await remotePut(backup.payload,Number(latest.revision));
+              applyRemote({revision,payload:backup.payload});
+            }catch(err){setStatus('No se pudo restaurar: '+err.message);}
+          }));
+        }catch(err){setStatus('No se pudieron consultar las copias: '+err.message);target.textContent='';}
+      });
       area.querySelector('#ecs-signout')?.addEventListener('click',signOut);
       area.querySelector('#ecs-sync')?.addEventListener('click',()=>sync());
       area.querySelector('#ecs-use-cloud')?.addEventListener('click',()=>{if(confirm('¿Restaurar la versión de la nube en esta aplicación? Se descargará una copia de tus datos locales antes de sustituirlos.'))applyRemote(conflictRemote);});
@@ -230,7 +260,7 @@
   function openDialog(){
     if(!dialog){
       const style=document.createElement('style');
-      style.textContent='.ecs-open{position:fixed;right:16px;bottom:18px;z-index:99998;background:#172636;color:white;border:1px solid #557d9d;border-radius:100px;padding:10px 15px;cursor:pointer;font:600 13px system-ui;box-shadow:0 5px 20px #0006}.ecs-backdrop{position:fixed;inset:0;z-index:99999;background:#0009;display:grid;place-items:center;padding:16px}.ecs-backdrop[hidden]{display:none}.ecs-panel{width:min(480px,100%);max-height:90vh;overflow:auto;background:#111c29;color:#fafafa;border:1px solid #526171;border-radius:18px;padding:24px;font:14px/1.5 system-ui;box-shadow:0 20px 70px #0008}.ecs-panel h2{margin:0 0 4px;font-size:22px}.ecs-panel h3{font-size:17px;margin:10px 0}.ecs-panel label{display:grid;gap:6px;margin:11px 0}.ecs-panel input{font:inherit;box-sizing:border-box;width:100%;border:1px solid #708195;border-radius:8px;background:#26354a;color:#fff;padding:10px}.ecs-panel button{font:inherit;background:#2a7ec6;color:#fff;border:0;border-radius:8px;padding:10px 13px;cursor:pointer}.ecs-panel button.ecs-secondary{background:#34465a}.ecs-panel button[disabled]{opacity:.5;cursor:default}.ecs-muted{color:#c1cbd8;font-size:12px}.ecs-actions{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0}.ecs-warning{border:1px solid #a97532;border-radius:9px;padding:12px;margin-top:14px;background:#362616}.ecs-close{float:right}.ecs-panel #ecosistema-cloud-status{margin-top:16px;color:#b3dfb8;font-size:12px;min-height:16px}';
+      style.textContent='.ecs-open{position:fixed;right:16px;bottom:18px;z-index:99998;background:#172636;color:white;border:1px solid #557d9d;border-radius:100px;padding:10px 15px;cursor:pointer;font:600 13px system-ui;box-shadow:0 5px 20px #0006}.ecs-backdrop{position:fixed;inset:0;z-index:99999;background:#0009;display:grid;place-items:center;padding:16px}.ecs-backdrop[hidden]{display:none}.ecs-panel{width:min(480px,100%);max-height:90vh;overflow:auto;background:#111c29;color:#fafafa;border:1px solid #526171;border-radius:18px;padding:24px;font:14px/1.5 system-ui;box-shadow:0 20px 70px #0008}.ecs-panel h2{margin:0 0 4px;font-size:22px}.ecs-panel h3{font-size:17px;margin:10px 0}.ecs-panel label{display:grid;gap:6px;margin:11px 0}.ecs-panel input{font:inherit;box-sizing:border-box;width:100%;border:1px solid #708195;border-radius:8px;background:#26354a;color:#fff;padding:10px}.ecs-panel button{font:inherit;background:#2a7ec6;color:#fff;border:0;border-radius:8px;padding:10px 13px;cursor:pointer}.ecs-panel button.ecs-secondary{background:#34465a}.ecs-panel button[disabled]{opacity:.5;cursor:default}.ecs-muted{color:#c1cbd8;font-size:12px}.ecs-actions{display:flex;gap:10px;flex-wrap:wrap;margin:13px 0}.ecs-warning{border:1px solid #a97532;border-radius:9px;padding:12px;margin-top:14px;background:#362616}.ecs-archive{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:8px 0;padding:8px 0;border-top:1px solid #46576b}.ecs-archive span{flex:1;min-width:120px;font-size:12px}.ecs-close{float:right}.ecs-panel #ecosistema-cloud-status{margin-top:16px;color:#b3dfb8;font-size:12px;min-height:16px}';
       document.head.appendChild(style);
       dialog=document.createElement('div');dialog.className='ecs-backdrop';dialog.hidden=true;
       dialog.innerHTML='<div class="ecs-panel" role="dialog" aria-modal="true" aria-label="Cuenta privada del ecosistema"><button type="button" class="ecs-close ecs-secondary" aria-label="Cerrar">✕</button><h2>Mi Ecosistema · Nube privada</h2><div id="ecosistema-cloud-body"></div><div id="ecosistema-cloud-status" role="status"></div></div>';
