@@ -142,6 +142,44 @@ body{background:radial-gradient(ellipse 850px 450px at 85% -15%,#142b682c,transp
 .timer-dock.pulso-mini-dock.mini-collapsed .mini-clocks strong{font-size:18px}
 [data-theme="light"] .timer-dock.pulso-mini-dock{background:#fff;color:#1a2a42}
 @media(max-width:760px){.timer-dock.pulso-mini-dock{bottom:80px;left:auto;right:8px;width:min(355px,calc(100vw - 16px))}.timer-dock.pulso-mini-dock.mini-collapsed{width:min(295px,calc(100vw - 16px))}}
+
+/* Lista minimalista: título y casilla hasta expandir. */
+.pulso-zen-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 17px;border:1px solid var(--stroke);border-radius:14px;background:var(--panel);margin-bottom:10px}
+.pulso-zen-top .eyebrow{font-size:10px;letter-spacing:.07em}.pulso-zen-progress{font-size:12px;font-weight:700;margin-top:4px}
+.pulso-zen-top-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.pulso-zen-top-actions label{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--muted)}
+.pulso-zen-groups{display:grid;grid-template-columns:1fr;gap:8px}
+.pulso-zen-group{background:var(--panel);border:1px solid var(--stroke);border-radius:13px;overflow:hidden}
+.pulso-zen-group-head{min-height:33px;display:flex;align-items:center;gap:9px;padding:5px 12px;background:var(--panel2);border-bottom:1px solid var(--stroke)}
+.pulso-zen-group-head strong{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px;font-weight:750}
+.pulso-zen-group-head small{color:var(--muted);font-size:10px}
+.pulso-zen-time{font:600 10px/1.25 ui-monospace,monospace;color:var(--blue);min-width:86px}
+.pulso-zen-add{background:transparent;border:1px solid transparent;border-radius:7px;color:var(--muted);cursor:pointer;font-size:16px;min-width:25px;height:25px}
+.pulso-zen-add:hover{border-color:var(--stroke2);color:var(--text)}
+.task-list.pulso-zen-list{padding:0!important;min-height:0!important;display:block!important}
+.task.pulso-zen-row{display:block!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;border-bottom:1px solid rgba(110,140,182,.10)!important}
+.task.pulso-zen-row:last-child{border-bottom:0!important}
+.pulso-zen-line{height:33px;display:flex;align-items:center;gap:10px;padding:0 12px}
+.pulso-zen-line:hover{background:rgba(98,144,219,.055)}
+.pulso-zen-check{height:16px!important;width:16px!important;min-width:16px!important;margin:0!important;flex:0 0 16px}
+.pulso-zen-title{border:none!important;background:transparent!important;color:var(--text)!important;text-align:left;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:570;cursor:pointer;padding:6px 0!important;display:block;outline-offset:3px}
+.pulso-zen-title:after{content:'⌄';float:right;font-size:14px;color:var(--muted2);opacity:.65;transition:transform .16s}
+.pulso-zen-row.is-open .pulso-zen-title:after{transform:rotate(180deg)}
+.pulso-zen-row.done .pulso-zen-title{text-decoration:line-through;opacity:.53}
+.pulso-zen-row.is-open{background:rgba(84,125,190,.055)!important}
+.pulso-zen-details{padding:10px 14px 13px 38px;border-top:1px solid rgba(110,140,182,.1)}
+.pulso-zen-facts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pulso-zen-facts span{font-size:10px;padding:4px 8px;border-radius:7px;background:rgba(104,145,204,.09);border:1px solid var(--stroke);color:var(--muted)}
+.pulso-zen-facts strong{color:var(--text);font-weight:750}
+.pulso-zen-editor{display:flex;gap:8px;flex-wrap:wrap}.pulso-zen-editor label{font-size:10px;color:var(--muted);display:grid;gap:3px}
+.pulso-zen-editor input{width:92px;max-width:100%;border:1px solid var(--stroke);background:var(--panel2);border-radius:8px;padding:7px;color:var(--text)}
+.pulso-zen-actions{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.pulso-zen-actions button{font:600 11px system-ui;color:var(--text);background:var(--panel2);border:1px solid var(--stroke);border-radius:9px;padding:7px 10px;cursor:pointer}
+.pulso-zen-actions button:hover{border-color:var(--blue)}
+.pulso-zen-empty{padding:7px 13px;color:var(--muted);font-size:11px}
+[data-theme="light"] .pulso-zen-group-head{background:#f4f7fb}
+[data-theme="light"] .pulso-zen-line:hover{background:rgba(38,84,150,.06)}
+@media(max-width:620px){.pulso-zen-time{min-width:70px;font-size:9px}.pulso-zen-line{height:36px}.pulso-zen-title{font-size:12px}}
+
 </style>
 <script src="../../core/private-cloud.js" data-ecosistema-app="pulso"></script>
 </head>
@@ -269,48 +307,56 @@ function changeBlock(id,block){let t=taskFromId(id);if(!t||!BLOCKS.some(b=>b.id=
 function removeTask(id){let ts=ensureDay(ui.date).tasks,i=ts.findIndex(t=>t.id===id);if(i===-1)return;if(!confirm('¿Eliminar esta tarea del día? Los tiempos registrados seguirán en el historial.'))return;ts.splice(i,1);closeModal();save();render();toast('Tarea eliminada del día')}
 
 /* PULSO · itinerario compacto. Mantiene los mismos datos, controles y bloques. */
+
+/* Plan sereno: solo nombre y casilla de verificación hasta abrir una tarea. */
 function compactTaskRow(t){
- const time=t.fixedTime || t.actualStart || '';
- const estimate=Number(t.estimate)>0?' · '+Math.round(Number(t.estimate))+' min':'';
- const required=t.required?' <span class="compact-mandatory" title="Obligatoria">●</span>':'';
- return '<article class="task compact-task-row '+(t.done?'done':'')+'" data-task="'+E(t.id)+'" draggable="true">'+
-  '<input type="checkbox" class="check-task" data-action="toggleTask" data-id="'+E(t.id)+'" '+(t.done?'checked':'')+' aria-label="Completar '+E(t.title)+'">'+
-  '<span class="compact-task-name" title="'+E(t.title)+'">'+E(t.title)+required+'</span>'+
-  '<span class="compact-task-details">'+(time?'<b>'+E(time)+'</b> · ':'')+E(t.area)+estimate+'</span>'+
-  '<span class="compact-task-buttons">'+
-   (!t.done?'<button class="compact-icon-btn" title="Iniciar temporizador" aria-label="Iniciar temporizador de '+E(t.title)+'" data-action="startTaskTimer" data-id="'+E(t.id)+'">'+ic('play',15)+'</button>':'')+
-   '<button class="compact-icon-btn" title="Editar tarea" aria-label="Editar '+E(t.title)+'" data-action="editTask" data-id="'+E(t.id)+'">'+ic('edit',15)+'</button>'+
-   '<button class="compact-icon-btn compact-arrow" title="Subir" aria-label="Subir '+E(t.title)+'" data-action="moveTask" data-dir="-1" data-id="'+E(t.id)+'">'+ic('up',14)+'</button>'+
-   '<button class="compact-icon-btn compact-arrow" title="Bajar" aria-label="Bajar '+E(t.title)+'" data-action="moveTask" data-dir="1" data-id="'+E(t.id)+'">'+ic('down',14)+'</button>'+
-  '</span></article>';
+ const open=ui.expandedTaskId===t.id;
+ const logged=sumSec(db.sessions.filter(s=>s.taskId===t.id));
+ const extra=db.sessions.filter(s=>s.taskId===t.id).reduce((n,s)=>n+num(s.nonProductiveSeconds),0);
+ return '<article class="task pulso-zen-row '+(open?'is-open ':'')+(t.done?'done':'')+'" data-task="'+E(t.id)+'" draggable="true">'+
+ '<div class="pulso-zen-line">'+
+ '<input class="check-task pulso-zen-check" type="checkbox" data-action="toggleTask" data-id="'+E(t.id)+'" '+(t.done?'checked':'')+' aria-label="Completar '+E(t.title)+'">'+
+ '<button type="button" class="pulso-zen-title" data-action="toggleTaskDetails" data-id="'+E(t.id)+'" aria-expanded="'+(open?'true':'false')+'" title="Mostrar u ocultar los detalles">'+E(t.title)+'</button>'+
+ '</div>'+
+ (open?'<div class="pulso-zen-details">'+
+ '<div class="pulso-zen-facts"><span>'+E(t.area)+'</span><span>Tiempo estimado: <strong>'+(num(t.estimate)>0?Math.round(num(t.estimate))+' min':'Sin definir')+'</strong></span>'+
+ (t.fixedTime?'<span>Hora: '+E(t.fixedTime)+'</span>':'')+
+ (t.objective?'<span>Objetivo: '+E(t.objective)+'</span>':'')+
+ (t.required?'<span>Obligatoria</span>':'')+
+ (logged?'<span>Registrado: '+dur(logged)+(extra?' · '+dur(extra)+' no productivos':'')+'</span>':'')+
+ '</div><div class="pulso-zen-editor">'+
+ '<label>Útil (min)<input type="number" data-min="'+E(t.id)+'" min="0" max="1440" step="0.5" placeholder="0"></label>'+
+ '<label>Extra (min)<input type="number" data-extra="'+E(t.id)+'" min="0" max="1440" step="0.5" placeholder="0"></label>'+
+ '<label>Inicio real<input type="time" data-start="'+E(t.id)+'" value="'+E(t.actualStart||'')+'"></label>'+
+ '</div><div class="pulso-zen-actions">'+
+ '<button type="button" data-action="startTaskTimer" data-id="'+E(t.id)+'">⏳ Iniciar temporizador</button>'+
+ '<button type="button" data-action="logQuick" data-id="'+E(t.id)+'">+ Registrar minutos</button>'+
+ '<button type="button" data-action="editTask" data-id="'+E(t.id)+'">Editar</button>'+
+ '<button type="button" data-action="moveTask" data-id="'+E(t.id)+'" data-dir="-1" title="Subir">↑</button>'+
+ '<button type="button" data-action="moveTask" data-id="'+E(t.id)+'" data-dir="1" title="Bajar">↓</button>'+
+ '</div></div>':'')+'</article>';
 }
 function renderCompactPlan(){
- const day=ensureDay(ui.date), all=day.tasks, done=all.filter(t=>t.done).length, hide=!!db.settings.compactHideDone;
+ const day=ensureDay(ui.date),all=day.tasks,done=all.filter(t=>t.done).length,hide=!!db.settings.compactHideDone;
  const sections=BLOCKS.map(b=>{
    const entries=blockTasks(b.id,ui.date);
    const visible=hide?entries.filter(t=>!t.done):entries;
-   const completed=entries.filter(t=>t.done).length;
    if(!entries.length)return '';
-   return '<section class="compact-block block-card" data-block-card="'+E(b.id)+'">'+
-    '<header class="compact-block-head"><span class="compact-block-time">'+E(b.start)+'–'+E(b.end)+'</span><strong>'+E(b.title)+'</strong>'+
-    '<span class="compact-block-count">'+completed+'/'+entries.length+'</span>'+
-    '<button class="compact-icon-btn" title="Añadir tarea en este bloque" aria-label="Añadir tarea en '+E(b.title)+'" data-action="newTaskBlock" data-block="'+E(b.id)+'">'+ic('plus',15)+'</button></header>'+
-    '<div class="task-list compact-task-list" data-drop="'+E(b.id)+'">'+
-    (visible.length?visible.map(compactTaskRow).join(''):'<div class="compact-empty">✓ Bloque completado</div>')+
+   return '<section class="pulso-zen-group block-card" data-block-card="'+E(b.id)+'">'+
+    '<div class="pulso-zen-group-head"><div class="pulso-zen-time">'+E(b.start)+' – '+E(b.end)+'</div><strong>'+E(b.title)+'</strong>'+
+    '<small>'+entries.filter(t=>t.done).length+'/'+entries.length+'</small>'+
+    '<button type="button" class="pulso-zen-add" data-action="newTaskBlock" data-block="'+E(b.id)+'" title="Añadir tarea">＋</button></div>'+
+    '<div class="task-list pulso-zen-list" data-drop="'+E(b.id)+'">'+
+    (visible.length?visible.map(compactTaskRow).join(''):'<div class="pulso-zen-empty">Todas completadas ✓</div>')+
     '</div></section>';
  }).filter(Boolean);
- return '<section class="compact-plan-summary"><div><strong>'+E(fmtDate(ui.date))+'</strong><span>'+done+' de '+all.length+' realizadas · '+(all.length-done)+' pendientes</span></div>'+
- '<label class="compact-hide-switch"><input type="checkbox" id="compact-hide-done" '+(hide?'checked':'')+'> Ocultar completadas</label>'+
- '<button class="btn primary small" data-action="newTask">'+ic('plus',15)+' Tarea</button></section>'+
- (sections.length?'<div class="compact-plan-list">'+sections.join('')+'</div>':'<div class="empty-day">No hay tareas para este día.</div>');
+ return '<div class="pulso-zen-top"><div><span class="eyebrow">PLAN DE HOY · '+E(fmtDate(ui.date))+'</span>'+
+ '<div class="pulso-zen-progress">'+done+' de '+all.length+' completadas</div></div>'+
+ '<div class="pulso-zen-top-actions"><label><input type="checkbox" id="compact-hide-done" '+(hide?'checked':'')+'> Ocultar completadas</label>'+
+ '<button type="button" class="btn primary small" data-action="newTask">＋ Nueva tarea</button></div></div>'+
+ (sections.length?'<div class="pulso-zen-groups">'+sections.join('')+'</div>':'<div class="empty-day">No hay tareas para este día.</div>');
 }
-function renderPlan(){
- const compact=db.settings.planView!=='detailed';
- return '<div class="plan-view-switch"><div><strong>Plan del día</strong><span class="tagline">Vista rápida o editor completo</span></div>'+
- '<div class="plan-view-buttons"><button type="button" class="btn small '+(compact?'primary':'ghost')+'" data-action="planCompact" aria-pressed="'+compact+'">☷ Lista compacta</button>'+
- '<button type="button" class="btn small '+(!compact?'primary':'ghost')+'" data-action="planDetailed" aria-pressed="'+(!compact)+'">▤ Vista detallada</button></div></div>'+
- (compact?renderCompactPlan():renderPlanExpanded());
-}
+function renderPlan(){return renderCompactPlan()}
 function quickLog(id){let t=taskFromId(id);if(!t)return;let inp=document.querySelector('[data-min="'+id+'"]'),minutes=num(inp?.value);if(minutes<=0||minutes>1440){toast('Escribe una duración válida (minutos).');return}db.sessions.push({id:aid(),date:ui.date,taskId:t.id,area:t.area,objective:t.objective||'',title:t.title,seconds:Math.round(minutes*60),note:'',kind:'manual',createdAt:new Date().toISOString()});save();render();toast(dur(minutes*60)+' registrados en '+t.area)}
 function timerElapsed(){let t=db.timer;if(!t)return 0;return num(t.elapsed)+(t.running?Math.max(0,Math.floor((Date.now()-t.startedAt)/1000)):0)}
 function startTimer(taskId=null, goalMinutes=null){
@@ -524,6 +570,7 @@ root.addEventListener('click',e=>{let b=e.target.closest('[data-action]');if(!b)
  case 'editReward':rewardModal(b.dataset.id);break;
  case 'claimReward':{let r=db.rewards.find(x=>x.id===b.dataset.id);if(!r||num(r.cost)>rewardBalance())return;if(confirm('¿Canjear «'+r.name+'» por '+r.cost+' XP?')){db.claims.push({id:aid(),rewardId:r.id,name:r.name,cost:num(r.cost),date:nowDate()});save();render();toast('¡Premio canjeado!')}break}
 }});
+root.addEventListener('click',e=>{const b=e.target.closest('[data-action="toggleTaskDetails"]');if(!b)return;ui.expandedTaskId=ui.expandedTaskId===b.dataset.id?null:b.dataset.id;render();});
 root.addEventListener('click',e=>{let a=e.target.closest('[data-action="planCompact"],[data-action="planDetailed"]');if(!a)return;db.settings.planView=a.dataset.action==='planCompact'?'compact':'detailed';save();render()});
 root.addEventListener('change',e=>{if(e.target.id!=='compact-hide-done')return;db.settings.compactHideDone=!!e.target.checked;save();render()});
 root.addEventListener('change',e=>{let t=e.target;if(t.matches('[data-action="toggleDoneView"]')){ui.showDone=t.checked;render();return}if(t.id==='day-start-time'){let d=ensureDay(ui.date);d.startTime=t.value||'08:00';save();render();return}if(t.id==='area-state'){ui.areaState=t.value;applyAreaFilters()}if(t.id==='area-dimension'){ui.areaDimension=t.value;applyAreaFilters()}});
