@@ -24,7 +24,7 @@
   let config = savedConfig || {url: configured.url || '', key: configured.key || ''};
   let session = readJson(SESSION_KEY);
   let dialog = null, statusText = '', busy = false, timer = null, conflictRemote = null;
-  let applying = false;
+  let applying = false, pendingSync = false;
 
   function readJson(key) {
     try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
@@ -141,6 +141,7 @@
     applying=true;
     for(const key of APP_KEYS[appId]) {
       if(typeof row.payload.keys[key] === 'string')nativeSet.call(localStorage,key,row.payload.keys[key]);
+      else nativeRemove.call(localStorage,key);
     }
     saveMeta(row.revision,row.payload);
     applying=false;
@@ -176,10 +177,15 @@
         showConflict(remote);
       }
     }catch(err) {setStatus('No se pudo sincronizar: '+err.message);}
-    finally {busy=false;renderDialog();}
+    finally {
+      busy=false;
+      renderDialog();
+      if(pendingSync) {pendingSync=false;queueSync();}
+    }
   }
   function queueSync(){
     if(!allowed || applying || !session || !validConfig(config))return;
+    if(busy){pendingSync=true;return;}
     clearTimeout(timer);timer=setTimeout(()=>sync(),1300);
   }
   // Do not intercept internal cloud keys. Only the exact whitelisted app keys trigger a sync.
