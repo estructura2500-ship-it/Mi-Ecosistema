@@ -13,6 +13,7 @@
   const CONFIG_KEY = 'ecosistema_cloud_config_v1';
   const SESSION_KEY = 'ecosistema_cloud_session_v1';
   const META_PREFIX = 'ecosistema_cloud_meta_v1:';
+  const OWNER_PREFIX = 'ecosistema_cloud_local_owner_v1:';
   const script = document.currentScript;
   const appId = script?.dataset?.ecosistemaApp || '';
   const allowed = Object.hasOwn(APP_KEYS, appId);
@@ -103,7 +104,7 @@
     return (hash>>>0).toString(16) + ':' + str.length;
   }
   function metaKey(){return META_PREFIX+(session?.user?.id||'')+':'+appId;}
-  function saveMeta(revision,payload) {storeJson(metaKey(),{revision,digest:digest(payload),updatedAt:new Date().toISOString()});}
+  function saveMeta(revision,payload) {storeJson(metaKey(),{revision,digest:digest(payload),updatedAt:new Date().toISOString()}); if(allowed && session?.user?.id) nativeSet.call(localStorage,OWNER_PREFIX+appId,session.user.id);}
   async function remoteGet(){
     const params = '?app_id=eq.'+encodeURIComponent(appId)+'&select=revision,payload&limit=1';
     const data=await api('/rest/v1/app_snapshots'+params,{auth:true});
@@ -155,6 +156,11 @@
     if(!allowed || !session || !validConfig(config) || busy || !navigator.onLine)return;
     busy=true;
     try {
+      const lastOwner=localStorage.getItem(OWNER_PREFIX+appId);
+      if(lastOwner && lastOwner!==session.user?.id) {
+        setStatus('Hay registros locales de otra cuenta. Para evitar mezclarlos, usa otro perfil del navegador o guarda una copia y cambia de perfil.');
+        return;
+      }
       const remote=await remoteGet(), local=getSnapshot(), prior=readJson(metaKey());
       if(!remote){
         if(local)await remotePut(local,0);else setStatus('Sesión activa. Aún no hay registros para subir.');
