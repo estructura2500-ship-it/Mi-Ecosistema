@@ -22,6 +22,17 @@ La sincronización maneja documentos JSON y no promete respaldar archivos multim
 - No dependas solo de `.gitignore` para evitar filtraciones: el historial de Git puede conservar datos que alguna vez se publicaron.
 - Los usuarios adicionales deben crearse únicamente si se desea compartir el servicio. Para uso privado, desactiva los nuevos registros una vez creada la cuenta propietaria en la configuración de Supabase.
 
+## Panel de seguridad personal
+
+Desde el portal o cualquier aplicación, abre **☁ Mi cuenta → Seguridad**.
+- Consulta las sesiones asociadas a tu cuenta, incluyendo fecha, navegador y dirección de red parcialmente oculta.
+- La sesión actual se identifica mediante su JWT; los registros no prueban por sí solos quién estuvo físicamente delante del equipo.
+- Puedes pulsar **Cerrar otras sesiones** para revocar las demás sesiones, tras confirmar. Sus tokens de acceso existentes podrían seguir funcionando hasta que expiren.
+- **Cerrar sesión** solicita revocar la sesión actual en Supabase y después elimina el token local. Si la conexión falla se elimina el token local, pero la sesión remota podría seguir activa hasta revocarla o expirar.
+- El registro público de cuentas puede desactivarse en [Supabase → Authentication → General Configuration](https://supabase.com/dashboard/project/lrwiqqkcwsizrbtytbqw/auth/settings), apagando **Allow new users to sign up**. Ya está creada la cuenta propietaria; conserva el inicio de sesión por email.
+- Este apartado no incluye todavía analíticas de visitas a GitHub Pages, seguimiento de accesos HTTP a cada aplicación ni alertas automáticas.
+- El procedimiento protegido `public.my_security_sessions` llama a un lector de sesiones en el esquema no expuesto `app_security`, y limita el resultado al `auth.uid()` autenticado.
+
 ## Verificaciones
 
 Las políticas RLS y la ausencia de lectura anónima fueron comprobadas. Falta una prueba completa real con una segunda sesión/dispositivo y una simulación de restauración de datos multimedia.
