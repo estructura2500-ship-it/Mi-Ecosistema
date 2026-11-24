@@ -17,14 +17,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Obtener el portal
+      - name: Obtener el repositorio
         uses: actions/checkout@v4
       - name: Configurar Pages
         uses: actions/configure-pages@v5
-      - name: Preparar sitio estático
+      - name: Preparar el portal estático
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./ecosistema-personal
-      - name: Publicar
+      - name: Publicar el portal
         id: deployment
         uses: actions/deploy-pages@v4
