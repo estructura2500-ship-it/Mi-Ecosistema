@@ -19,7 +19,7 @@
   const allowed = Object.hasOwn(APP_KEYS, appId);
   const nativeSet = Storage.prototype.setItem;
   const nativeRemove = Storage.prototype.removeItem;
-  const configured = window.ECOSISTEMA_CLOUD_CONFIG || {};
+  const configured = window.ECOSISTEMA_CLOUD_CONFIG || {url:'https://lrwiqqkcwsizrbtytbqw.supabase.co',key:"sb_publishable_jldukrUoL7tApyQyWFJ_5w_FaMpyK9y"};
   const savedConfig = readJson(CONFIG_KEY);
   let config = savedConfig || {url: configured.url || '', key: configured.key || ''};
   let session = readJson(SESSION_KEY);
