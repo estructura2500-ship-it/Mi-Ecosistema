@@ -1,40 +1,40 @@
-# PULSO · Plan compacto y temporizador flotante
+# PULSO · Lista minimalista y dos relojes independientes
 
-## Dónde está
+Actualización: **24 de noviembre de 2026**.
 
-- [Abrir PULSO](https://estructura2500-ship-it.github.io/Mi-Ecosistema/ecosistema-personal/apps/pulso/index.html)
-- **Plan del día → ☷ Lista compacta** muestra todas las tareas agrupadas en sus bloques horarios y minimiza el espacio que ocupa cada una.
-- **▤ Vista detallada** recupera el diseño anterior, con todos los campos, movimientos y registros. La elección se guarda en las preferencias de PULSO y se sincroniza con la cuenta.
-- En la lista compacta se puede completar, iniciar o editar cada tarea. También se pueden reordenar con las flechas desde pantallas grandes o arrastrando en escritorio. «Ocultar completadas» elimina de la vista las tareas ya realizadas, no las borra.
+## Plan del día
 
-## Cronómetro + cuenta regresiva
+- Cada fila muestra únicamente el **nombre de la tarea y su casilla de verificación**.
+- Pulsa el nombre para abrir o cerrar los detalles de esa tarea, incluida la duración estimada, los registros de tiempo, los objetivos, el botón del temporizador, editar y reordenar.
+- Las tareas se organizan por bloques horarios de forma compacta. Las completadas pueden ocultarse desde la parte superior.
+- Los checks siguen guardándose en la clave original de PULSO y sincronizándose con la cuenta de Supabase.
 
-- Pulsa **▶** en cualquier tarea del plan, o **⏱ Timer** en la cabecera para una sesión libre.
-- El widget aparece en PULSO de forma flotante. Muestra **nombre de la tarea, tiempo restante y cronómetro transcurrido**.
-- Si la tarea tiene una estimación configurada, esa cantidad de minutos es la duración inicial del temporizador. De lo contrario el valor predeterminado es **15 minutos**.
-- Puedes elegir 5, 15, 25, 45 o 60 minutos, o una duración personalizada de 1 a 240 minutos.
-- El selector «Ver cronómetro / Ver cuenta regresiva» cambia el reloj principal; ambos tiempos siguen disponibles.
-- Arrastra el botón **⠿** para mover el widget dentro de la página, o pulsa **—** para minimizarlo.
-- Cuando el tiempo restante llega a cero, PULSO lo indica y trata de sonar una alerta. Si el navegador bloquea el audio en segundo plano, la alerta sonora puede no reproducirse. **La sesión continúa contando hasta que la guardes**.
-- Al pulsar **Guardar**, PULSO sigue usando su formulario existente para registrar tiempo útil y minutos no productivos. No se duplican sesiones.
+## Temporizador clásico
 
-## Ventana siempre visible (si el navegador lo admite)
+- Al iniciar el temporizador de una tarea, la burbuja azul flotante se parece al **PULSO original**: reloj transcurrido grande a la izquierda, nombre de la actividad debajo y **Pausar / Guardar** a la derecha.
+- Debajo del nombre se muestra discretamente **cuánto tiempo queda**.
+- El menú **⋯** contiene: selección de actividad, 5/15/25/45/60 minutos o duración personalizada, reiniciar, borrar sin registrar y, si está disponible, una ventana Picture-in-Picture.
+- Por defecto usa los minutos estimados de la tarea; si faltan, **15 minutos**.
+- Guardar registra tiempo útil en PULSO. **Borrar sin guardar no suma minutos**.
 
-En el widget de PULSO pulsa **↗**. Si tu navegador admite **Document Picture-in-Picture**, aparecerá una miniventana independiente que puede permanecer encima de otras ventanas del escritorio. La pestaña de PULSO debe seguir abierta. Si el navegador no admite esta función, utiliza la extensión descrita abajo.
+## Cronómetro general
 
-## Extensión para Brave, Chrome y Edge
+- En la barra de PULSO pulsa **⏱ Cronómetro** para iniciar un cronómetro que NO se asigna a una tarea.
+- Se abre una segunda tarjeta flotante, independiente, con el mismo estilo clásico y sus propios botones Pausar / Guardar.
+- **Temporizador y cronómetro pueden funcionar simultáneamente** sin que iniciar uno encienda el otro.
+- El cronómetro general se registra en el área elegida en su menú ⋯ (Estructura por defecto) si decides guardarlo.
+- Se puede reiniciar o borrar sin sumar minutos.
 
-La extensión opcional **PULSO · Minitemporizador flotante** permite mostrar el mismo temporizador encima de la página web que elijas.
+## Extensión opcional para Brave, Chrome y Edge
 
-- Instala el archivo ZIP de la extensión desde tu paquete de descarga, descomprimiéndolo primero; después visita `brave://extensions`, `chrome://extensions` o `edge://extensions`, habilita Modo desarrollador y pulsa «Cargar descomprimida».
-- Abre PULSO desde el portal y comienza una sesión; después abre otra pestaña web y pulsa el icono de la extensión.
-- La extensión no lee el contenido de las otras páginas. Solo se inserta cuando haces clic en su icono en esa pestaña.
-- La pestaña de PULSO debe seguir abierta para que los botones Pausar, Continuar y Guardar controlen su sesión real.
-- Si necesitas el reloj en varias pestañas, haz clic en el icono de la extensión en cada una.
-- No funciona sobre pestañas internas del navegador (como `brave://`) ni sobre el escritorio de Windows. Para verlo encima de otras aplicaciones usa la ventana Picture-in-Picture cuando sea compatible.
+La extensión **PULSO · Temporizador clásico 1.2** presenta una burbuja compacta con el mismo diseño. Pulsa **⋯** para abrir la selección de la siguiente tarea, marcarla como completada, elegir la duración, reiniciar o descartar y consultar el cronómetro general. No hay botones de cronómetro dentro de las filas de las tareas.
 
-## Privacidad y respaldo
+La extensión se activa manualmente con su icono en una pestaña web. Necesita que otra pestaña de **PULSO** permanezca abierta para controlar, guardar y sincronizar los registros. No funciona sobre páginas internas `brave://`, el escritorio de Windows ni otras aplicaciones.
 
-Esta versión reutiliza la clave existente `pulso_life_os_v2_datos_migrados_20261110` y añade preferencias y campos del temporizador compatibles con los datos anteriores. La extensión recibe **solo el nombre de la tarea y metadatos del temporizador**, almacenados en su almacenamiento local; nunca necesita una clave de Supabase, el respaldo completo ni permisos para leer todas las webs.
+**Instalación:** descomprime el ZIP de la extensión v3, abre `brave://extensions`, activa modo desarrollador, desactiva la extensión PULSO anterior (evita duplicados) y selecciona «Cargar descomprimida».
 
-Los datos completos de PULSO se siguen guardando en el navegador y en Supabase si has iniciado sesión. No se publican respaldos personales en GitHub.
+## Privacidad
+
+Los datos siguen en el navegador y en la cuenta de Supabase al iniciar sesión. El código del repositorio público no contiene los respaldos privados. La extensión solo conserva localmente metadatos de las tareas del día y de los relojes, no contraseñas ni respaldos completos.
+
+Cuando los navegadores limitan la ejecución en segundo plano, el reloj se calcula usando la hora de inicio y la duración transcurrida para evitar desviaciones visuales al regresar.
